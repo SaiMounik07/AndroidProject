@@ -40,7 +40,7 @@ class ConstraintLoginActivity : AppCompatActivity() {
                     name = username.text.toString(),
                     password = password.text.toString(),
                     onSuccess = {
-                        startActivity(Intent(this, SearchActivity::class.java))
+                        startActivity(Intent(this, HomeActivity::class.java))
                     },
                     onFailure = {
                         Toast.makeText(this, "Please Enter Username", Toast.LENGTH_SHORT).show()

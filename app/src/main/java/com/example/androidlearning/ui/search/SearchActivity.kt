@@ -17,6 +17,7 @@ import com.example.androidlearning.model.Product
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import android.view.inputmethod.InputMethodManager
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class SearchActivity: AppCompatActivity() {
@@ -47,7 +48,19 @@ class SearchActivity: AppCompatActivity() {
             productAdapter.updateData(products.filter { i->i.name.lowercase().contains(searchText.text.toString().lowercase()) }.toList())
 
         }
-
+        val btnScrollTop = findViewById<FloatingActionButton>(R.id.btn_scroll_top)
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+                if (!rv.canScrollVertically(-1)) {
+                    btnScrollTop.hide()
+                } else {
+                    btnScrollTop.show()
+                }
+            }
+        })
+        btnScrollTop.setOnClickListener {
+            recyclerView.smoothScrollToPosition(0)
+        }
         searchText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
 

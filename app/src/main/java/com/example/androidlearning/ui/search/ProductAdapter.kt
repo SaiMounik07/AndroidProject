@@ -37,8 +37,42 @@ class ProductAdapter(private var products: List<Product>): RecyclerView.Adapter<
         holder.tvFreeShipping.visibility =
             if (product.uspLabelsTags.contains("FREE_SHIPPING")) View.VISIBLE else View.GONE
 
+
         holder.tvDiscountLabel.text = "Diskon ${product.price.discount}%"
-        holder.tvRating.text = product.review.rating.toString()
+        if (product.review.rating==0 && product.review.sellerRating!=0.0){
+            holder.ivRatingStar.visibility=View.GONE
+            holder.ivStoreRating.visibility=View.VISIBLE
+            holder.tvRating.visibility= View.VISIBLE
+            holder.tvRating.text=product.review.sellerRating.toString()
+            holder.tvDot.visibility= View.VISIBLE
+            holder.tvSoldText.visibility= View.VISIBLE
+            holder.tvSoldNumbers.visibility= View.VISIBLE
+        }else if (product.review.rating!=0 && product.review.sellerRating!=0.0 ){
+            holder.ivRatingStar.visibility=View.VISIBLE
+            holder.ivStoreRating.visibility=View.GONE
+            holder.tvRating.visibility= View.VISIBLE
+            holder.tvRating.text=product.review.rating.toString()
+            holder.tvDot.visibility= View.VISIBLE
+            holder.tvSoldText.visibility= View.VISIBLE
+            holder.tvSoldNumbers.visibility= View.VISIBLE
+        }else if ((product.review.rating==0 && product.review.sellerRating==0.0) && product.soldCountTotal!=0 ){
+            holder.ivRatingStar.visibility=View.GONE
+            holder.ivStoreRating.visibility=View.GONE
+            holder.tvRating.visibility= View.GONE
+            holder.tvDot.visibility= View.VISIBLE
+            holder.tvSoldText.visibility= View.VISIBLE
+            holder.tvSoldNumbers.visibility= View.VISIBLE
+        }else{
+            holder.ivRatingStar.visibility=View.GONE
+            holder.ivStoreRating.visibility=View.GONE
+            holder.tvRating.visibility= View.GONE
+            holder.tvDot.visibility= View.GONE
+            holder.tvSoldText.visibility= View.GONE
+            holder.tvSoldNumbers.visibility= View.GONE
+
+        }
+
+
         holder.tvSoldNumbers.text = product.soldCountTotal.toString()
         holder.tvSoldText.text = "Terjual"
         holder.tvStoreName.text = product.location
@@ -63,10 +97,11 @@ class ProductAdapter(private var products: List<Product>): RecyclerView.Adapter<
         val tvProductPrice = itemView.findViewById<TextView>(R.id.product_price)
         val ivTicketIcon = itemView.findViewById<ImageView>(R.id.iv_tiket_icon)
         val tvActualPrice = itemView.findViewById<TextView>(R.id.tv_actual_price)
-        val tvDiscountPercent = itemView.findViewById<TextView>(R.id.tv_dicount_percent)
+        val tvDiscountPercent = itemView.findViewById<TextView>(R.id.tv_discount_percent)
         val tvFreeShipping = itemView.findViewById<TextView>(R.id.tv_free_shipping_text)
-        val tvDiscountLabel = itemView.findViewById<TextView>(R.id.tv_dicount_label)
+        val tvDiscountLabel = itemView.findViewById<TextView>(R.id.tv_discount_label)
         val ivRatingStar = itemView.findViewById<ImageView>(R.id.iv_rating_star)
+        val ivStoreRating= itemView.findViewById<ImageView>(R.id.iv_shop_rating)
         val tvRating = itemView.findViewById<TextView>(R.id.tv_rating)
         val tvDot = itemView.findViewById<TextView>(R.id.dot)
         val tvSoldText = itemView.findViewById<TextView>(R.id.tv_sold_text)
@@ -74,6 +109,8 @@ class ProductAdapter(private var products: List<Product>): RecyclerView.Adapter<
         val ivOfficialIcon = itemView.findViewById<ImageView>(R.id.iv_official_icon)
         val ivDiamondIcon = itemView.findViewById<ImageView>(R.id.iv_diamond_icon)
         val tvStoreName = itemView.findViewById<TextView>(R.id.tv_store_name)
+        val flow_rating=itemView.findViewById<androidx.constraintlayout.helper.widget.Flow>(R.id.flow_rating)
+
     }
     fun updateData(newProducts: List<Product>) {
         products = newProducts
