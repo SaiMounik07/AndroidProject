@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/relativelayout"
+    android:background="@color/white"
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    >
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/firsttext"
+        android:text="Helllo Relative Layout"
+        android:textSize="@dimen/font_size_header"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="username: "
+        android:layout_centerVertical="true"
+        android:id="@+id/username1"
+        android:layout_toStartOf="@+id/username_input"
+        />
+    <EditText
+        android:id="@+id/username_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="Enter Username"
+        android:layout_centerInParent="true"/>
+
+    <TextView
+        android:id="@+id/password1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/username1"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="11dp"
+        android:layout_marginEnd="3dp"
+        android:layout_toStartOf="@+id/password_input"
+        android:text="PassWord: " />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:hint="Enter Password"
+        android:id="@+id/password_input"
+        android:layout_centerInParent="true"
+        android:layout_below="@+id/username1"
+        />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/password_input"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="10dp"
+        android:text="submit"
+        />
+
+
+
+
+
+</RelativeLayout>

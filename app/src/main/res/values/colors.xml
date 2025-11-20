@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="blibli">#D3E7FF</color>
+    <color name="blibliBlue">#007CFF</color>
+    <color name="greyName">#71747D</color>
+    <color name="discount_red">#FFE6E7</color>
+    <color name="dicount_text_red">#D43534</color>
+    <color name="free_shipping_color">#B2EFBA</color>
+    <color name="free_shipping_text_color">#1C832B</color>
+    <color name="discount_label_border">#BADEFF</color>
+    <color name="discount_label_text">#006EEA</color>
+    <color name="golden">#FDB814</color>
+    <color name="close_bg">#797F85</color>
+
+</resources>
