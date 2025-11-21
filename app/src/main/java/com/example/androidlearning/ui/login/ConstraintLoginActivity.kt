@@ -23,8 +23,8 @@ class ConstraintLoginActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_constraint)
         constraintViewModel = ViewModelProvider(this).get(ConstraintViewModel::class.java)
-        constraintViewModel.saveValues("username", "12345")
-        constraintViewModel.saveValues("password", "12345")
+        constraintViewModel.saveValues("username", "sai")
+        constraintViewModel.saveValues("password", "sai")
         Toast.makeText(this, "Constraint Layout", Toast.LENGTH_SHORT).show()
         val username = findViewById<EditText>(R.id.userfield)
         val password = findViewById<EditText>(R.id.password_field)
@@ -40,7 +40,7 @@ class ConstraintLoginActivity : AppCompatActivity() {
                     name = username.text.toString(),
                     password = password.text.toString(),
                     onSuccess = {
-                        startActivity(Intent(this, SearchActivity::class.java))
+                        startActivity(Intent(this, HomeActivity::class.java))
                     },
                     onFailure = {
                         Toast.makeText(this, "Please Enter Username", Toast.LENGTH_SHORT).show()

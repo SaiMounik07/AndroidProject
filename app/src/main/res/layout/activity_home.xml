@@ -17,10 +17,21 @@
         android:id="@+id/tv_login_user"
         />
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/mb_logout"
+        android:id="@+id/search_page"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/tv_login_user"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:text="search page"
+        android:backgroundTint="@color/blibliBlue"
+        app:cornerRadius="@dimen/layout_spacing"
+        />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/mb_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/search_page"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:text="Logout"
