@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/no_products_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="24dp"
+    android:paddingEnd="24dp"
+    android:paddingTop="50dp"
+    android:paddingBottom="28dp"
+    android:background="@android:color/transparent">
+
+    <ImageView
+        android:id="@+id/ivNoProducts"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:src="@drawable/img_6"
+        android:scaleType="fitCenter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Produk nya belum ada"
+        android:textSize="18sp"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#0F1724"
+        app:layout_constraintStart_toEndOf="@id/ivNoProducts"
+        app:layout_constraintTop_toTopOf="@id/ivNoProducts"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tvSubtitle"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="8dp"/>
+
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Silakan coba kata pencarian lainnya untuk menemukan produk yang kamu cari."
+        android:textSize="14sp"
+        android:fontFamily="sans-serif"
+        android:textColor="#6B7280"
+        android:lineSpacingExtra="2dp"
+        app:layout_constraintStart_toStartOf="@id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btnSearchAgain"
+
+    />
+
+    <Button
+        android:id="@+id/btnSearchAgain"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_marginTop="2dp"
+        android:backgroundTint="@color/blibliBlue"
+        android:fontFamily="sans-serif-medium"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"
+        android:text="Coba kata pencarian lain"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@id/ivNoProducts"
+        app:layout_constraintStart_toStartOf="@id/tvTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

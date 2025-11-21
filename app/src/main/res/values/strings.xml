@@ -1,8 +1,8 @@
 <resources>
-        <string name="app_name">Learn</string>
-        <string name="login_hint">Nomor HP atau email</string>
-        <string name="login_text">Log In</string>
-        <string name="login_others">Log in Lebih cepat degan</string>
+    <string name="app_name">Learn</string>
+    <string name="login_hint">Nomor HP atau email</string>
+    <string name="login_text">Log In</string>
+    <string name="login_others">Log in Lebih cepat degan</string>
 
 
 </resources>

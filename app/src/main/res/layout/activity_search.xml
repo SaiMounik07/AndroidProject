@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/recycler_view_layout"
     android:padding="16dp">
 
     <ImageView
@@ -54,8 +55,8 @@
         android:padding="8dp"
         android:src="@drawable/search_bar_icon"
         app:layout_constraintEnd_toEndOf="@id/et_search"
-        app:layout_constraintBottom_toBottomOf="@+id/et_search"
-        app:layout_constraintTop_toTopOf="@+id/et_search"
+        app:layout_constraintBottom_toBottomOf="@id/et_search"
+        app:layout_constraintTop_toTopOf="@id/et_search"
         android:clickable="true"
         />
 
@@ -69,6 +70,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="16dp"/>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btn_scroll_top"
         android:layout_width="wrap_content"
@@ -82,11 +94,11 @@
         app:maxImageSize="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
-
-
-
-
-
+        <include
+        android:id="@+id/noProductsInclude"
+        layout="@layout/data_not_found"
+        app:layout_constraintEnd_toStartOf="@id/et_search"
+        android:visibility="gone"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

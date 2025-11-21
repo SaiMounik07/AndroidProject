@@ -8,8 +8,8 @@
     android:padding="8dp">
     <ImageView
         android:id="@+id/iv_product_image"
-        android:layout_width="160dp"
-        android:layout_height="160dp"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:layout_marginStart="@dimen/five_dp"
         android:layout_marginBottom="10dp"
         android:src="@drawable/img_1"
@@ -17,6 +17,29 @@
         android:clipToOutline="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+    <ImageView
+        android:id="@+id/free_shipping_logo"
+        android:layout_width="50dp"
+        android:layout_height="20dp"
+        android:src="@drawable/img_4"
+        app:layout_constraintBottom_toBottomOf="@id/iv_product_image"
+        app:layout_constraintStart_toStartOf="@id/iv_product_image"
+        app:layout_constraintEnd_toStartOf="@+id/iv_flashsale"
+        />
+
+    <ImageView
+        android:id="@+id/iv_flashsale"
+        android:layout_width="50dp"
+        android:layout_height="20dp"
+        android:layout_marginHorizontal="@dimen/five_dp"
+        android:src="@drawable/img_5"
+        app:layout_constraintBottom_toBottomOf="@id/iv_product_image"
+        app:layout_constraintStart_toEndOf="@+id/free_shipping_logo"
+        app:layout_constraintLeft_toLeftOf="@+id/iv_product_image"
+        />
+
+
+
 
     <TextView
         android:id="@+id/product_name"
@@ -33,47 +56,44 @@
         android:id="@+id/product_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rp170.800"
+        android:text="Rp170.800.000.000"
         android:textColor="@color/blibliBlue"
         android:textSize="14sp" />
 
-    <ImageView
-        android:id="@+id/iv_tiket_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ticket"
-         />
 
     <TextView
         android:id="@+id/tv_actual_price"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="400.000"
+        android:text="400.000.000"
         android:textColor="@color/greyName"
-        android:textSize="12sp"
+        android:textSize="10sp"
         />
 
     <TextView
         android:id="@+id/tv_discount_percent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="20%"
+        android:text="40%"
         android:background="@drawable/discount_background"
         android:textColor="@color/dicount_text_red"
         android:padding="3dp"
         android:textSize="10sp"
+        android:layout_marginEnd="10dp"
         />
 
     <androidx.constraintlayout.helper.widget.Flow
         android:id="@+id/flow_price"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
+        app:flow_horizontalBias="0"
+        android:layout_marginEnd="10dp"
     app:constraint_referenced_ids="product_price,iv_tiket_icon,tv_actual_price,tv_discount_percent"
-    app:flow_horizontalGap="8dp"
-    app:flow_verticalGap="6dp"
+    app:flow_horizontalGap="3dp"
     app:flow_horizontalStyle="packed"
-    app:flow_wrapMode="none"
+    app:flow_wrapMode="aligned"
+    app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toEndOf="@id/iv_product_image"
     app:layout_constraintTop_toBottomOf="@id/product_name" />
 
@@ -98,7 +118,6 @@
         android:padding="4dp"
         android:textSize="12sp" />
 
-    <!-- Flow for labels row -->
     <androidx.constraintlayout.helper.widget.Flow
         android:id="@+id/flow_labels"
         android:layout_width="wrap_content"
@@ -111,7 +130,6 @@
         app:layout_constraintStart_toEndOf="@id/iv_product_image"
         app:layout_constraintTop_toBottomOf="@id/flow_price" />
 
-    <!-- RATING ROW children -->
     <ImageView
         android:id="@+id/iv_rating_star"
         android:layout_width="wrap_content"
@@ -158,14 +176,13 @@
         android:textColor="@color/greyName"
         android:textSize="13sp" />
 
-    <!-- Flow for rating row -->
     <androidx.constraintlayout.helper.widget.Flow
         android:id="@+id/flow_rating"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         app:constraint_referenced_ids="iv_rating_star,iv_shop_rating,tv_rating,dot,tv_sold_text,tv_sold_numbers"
-        app:flow_horizontalGap="8dp"
+        app:flow_horizontalGap="4dp"
         app:flow_horizontalStyle="packed"
         app:flow_wrapMode="none"
         app:layout_constraintStart_toEndOf="@id/iv_product_image"
@@ -173,7 +190,6 @@
 
         />
 
-    <!-- STORE ROW children -->
     <ImageView
         android:id="@+id/iv_official_icon"
         android:layout_width="20dp"
@@ -197,14 +213,13 @@
         android:textColor="@color/greyName"
         android:textSize="13sp" />
 
-    <!-- Flow for store row -->
     <androidx.constraintlayout.helper.widget.Flow
         android:id="@+id/flow_store"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="6dp"
         app:constraint_referenced_ids="iv_official_icon,iv_diamond_icon,tv_store_name"
-        app:flow_horizontalGap="6dp"
+        app:flow_horizontalGap="1dp"
         app:flow_horizontalStyle="packed"
         app:flow_wrapMode="none"
         app:layout_constraintStart_toEndOf="@id/iv_product_image"
