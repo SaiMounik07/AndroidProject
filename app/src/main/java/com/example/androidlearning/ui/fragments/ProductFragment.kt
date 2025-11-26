@@ -86,7 +86,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
                 }
 
                 override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    binding.noProductsInclude.root.visibility = View.GONE
+                    noProductsInclude.root.visibility = View.GONE
                 }
 
                 override fun afterTextChanged(s: Editable?) {
@@ -107,7 +107,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
                                     it.name.contains(query, ignoreCase = true)
                                 }
 
-                                binding.noProductsInclude.root.visibility =
+                                noProductsInclude.root.visibility =
                                     if (filtered.isEmpty()) View.VISIBLE else View.GONE
                                 productAdapter.updateData(filtered)
                             }
