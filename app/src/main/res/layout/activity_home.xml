@@ -3,9 +3,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/home"
     >
 
+    <EditText
+        android:id="@+id/et_search_home"
+        android:layout_width="300dp"
+        android:layout_height="@dimen/search_bar_height"
+        android:hint="@string/search_hint"
+        android:background="@drawable/search_bar_bg"
+        android:layout_marginHorizontal="@dimen/five_dp"
+        app:layout_constraintStart_toStartOf="parent"
+        android:padding="@dimen/five_dp"
+        android:layout_marginVertical="@dimen/five_dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="@dimen/search_bar_text_size"
+        android:textColor="@color/black"
+        android:textAlignment="textStart"
+        android:clickable="true"
+        />
 
+
+    <ImageView
+        android:id="@+id/iv_search_home"
+        android:layout_width="@dimen/search_icon_size"
+        android:layout_height="@dimen/search_icon_size"
+        android:layout_marginEnd="@dimen/search_icon_margin_end"
+        android:background="@drawable/search_icon"
+        android:padding="@dimen/search_icon_padding"
+        android:src="@drawable/search_bar_icon"
+        app:layout_constraintEnd_toEndOf="@id/et_search_home"
+        app:layout_constraintBottom_toBottomOf="@id/et_search_home"
+        app:layout_constraintTop_toTopOf="@id/et_search_home"
+        android:clickable="true"
+        />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -38,6 +70,7 @@
         android:backgroundTint="@color/blibliBlue"
         app:cornerRadius="@dimen/layout_spacing"
         />
+
 
 
 

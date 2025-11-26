@@ -17,30 +17,35 @@ class ProductAdapter(private var products: List<Product>, private val onProductC
         viewType: Int
     ): ProductViewHolder {
 
-        val binding= CardProductBinding.inflate(LayoutInflater.from(parent.context))
+        val binding = CardProductBinding.inflate(LayoutInflater.from(parent.context))
         return ProductViewHolder(binding)
     }
     override fun onBindViewHolder(holder: ProductViewHolder, position: Int) {
         val product = products[position]
         with(holder.binding) {
-            productData(product,onProductClick)
+            productData(product, onProductClick)
 
         }
     }
 
     override fun getItemCount(): Int {
-       return products.size
+        return products.size
     }
 
-     class ProductViewHolder(val binding: CardProductBinding): RecyclerView.ViewHolder(binding.root)
+    class ProductViewHolder(val binding: CardProductBinding) : RecyclerView.ViewHolder(binding.root)
 
 
     fun updateData(newProducts: List<Product>) {
-        products = newProducts
-        notifyDataSetChanged()
+        if (products is MutableList) {
+            (products as MutableList<Product>).clear()
+            (products as MutableList<Product>).addAll(newProducts)
+            notifyDataSetChanged()
+        } else {
+            products = newProducts
+            notifyDataSetChanged()
+        }
     }
 }
-
 
 fun CardProductBinding.productData(product: Product,onProductClick: (Product) -> Unit ={}) {
     if (!product.name.isEmpty()) {

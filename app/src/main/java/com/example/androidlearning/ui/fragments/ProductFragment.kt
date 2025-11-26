@@ -13,6 +13,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidlearning.R
+import com.example.androidlearning.base.constants.Constants.LOAD_DELAY_MS
+import com.example.androidlearning.base.constants.Constants.MIN_SEARCH_LENGTH
+import com.example.androidlearning.base.constants.Constants.SEARCH_DEBOUNCE_MS
 import com.example.androidlearning.databinding.CardProductBinding
 import com.example.androidlearning.databinding.SearchFragmentBinding
 import com.example.androidlearning.data.model.Product
@@ -20,101 +23,65 @@ import com.example.androidlearning.ui.search.ProductAdapter
 import com.example.androidlearning.ui.search.SearchViewModel
 import com.example.androidlearning.ui.search.productData
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+
 class ProductFragment : Fragment(R.layout.search_fragment) {
-    private var allProducts: List<Product> = emptyList()
     private var displayedProducts: MutableList<Product> = mutableListOf()
     private lateinit var productAdapter: ProductAdapter
+    private lateinit var layoutManager: LinearLayoutManager
     private var isLoading = false
-    lateinit var binding: SearchFragmentBinding
-    lateinit var searchViewModel: SearchViewModel
+    private lateinit var binding: SearchFragmentBinding
+    private lateinit var searchViewModel: SearchViewModel
+    
+    private var searchRunnable: Runnable? = null
+    private val searchHandler = Handler(Looper.getMainLooper())
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         binding = SearchFragmentBinding.bind(view)
-        val layoutManager = LinearLayoutManager(requireContext())
-        with(binding) {
-            recyclerView.layoutManager = layoutManager
-            recyclerView.visibility = View.VISIBLE
+        searchViewModel = ViewModelProvider(requireActivity())[SearchViewModel::class.java]
 
-            searchViewModel= ViewModelProvider(requireActivity())[SearchViewModel::class.java]
+        setupRecyclerView()
+        setupSearchListeners()
+        setupClickListeners()
+        loadInitialData()
+    }
 
-            allProducts =searchViewModel.loadProductsFromJson(requireContext())
+    private fun setupRecyclerView() {
+        layoutManager = LinearLayoutManager(requireContext())
+        with(binding.recyclerView) {
+            this.layoutManager = this@ProductFragment.layoutManager
+            visibility = View.VISIBLE
             productAdapter = ProductAdapter(displayedProducts) { product ->
                 showProductDetailsBottomSheet(product)
             }
-            recyclerView.adapter = productAdapter
+            adapter = productAdapter
+            addOnScrollListener(createScrollListener())
+        }
+    }
 
-            loadMoreProducts()
+    private fun setupSearchListeners() {
+        binding.etSearch.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
-            ivSearch.setOnClickListener {
-                val query = etSearch.text.toString().lowercase()
-                val filtered = allProducts.filter { i -> i.name.lowercase().contains(query)
-                }
-                productAdapter.updateData(filtered)
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                binding.noProductsInclude.root.visibility = View.GONE
             }
-            val btnScrollTop = view.findViewById<FloatingActionButton>(R.id.btn_scroll_top)
-            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
-                    if (!rv.canScrollVertically(-1)) {
-                        btnScrollTop.hide()
-                    } else {
-                        btnScrollTop.show()
-                    }
 
-                    if (!isLoading && layoutManager.findLastCompletelyVisibleItemPosition() == displayedProducts.size - 1) {
-                        loadMoreProducts()
-                    }
-                }
-            })
+            override fun afterTextChanged(s: Editable?) {
+                handleSearchTextChange(s?.toString() ?: "")
+            }
+        })
+    }
+
+    private fun setupClickListeners() {
+        with(binding) {
             btnScrollTop.setOnClickListener {
                 recyclerView.smoothScrollToPosition(0)
             }
             ivBack.setOnClickListener {
                 findNavController().navigateUp()
             }
-
-            etSearch.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                    noProductsInclude.root.visibility = View.GONE
-                }
-
-                override fun afterTextChanged(s: Editable?) {
-                    s?.toString()?.length?.let {
-                        if (it >= 3 || it == 0) {
-                            val query = s.toString().trim()
-                            binding.ivClearText.visibility =
-                                if (query.isEmpty()) View.GONE else View.VISIBLE
-                            if (query.length < 3) {
-                                binding.noProductsInclude.root.visibility = View.GONE
-                                displayedProducts.clear()
-                                loadMoreProducts()
-                                productAdapter.updateData(displayedProducts)
-                                return
-                            }
-                            if (!isLoading) {
-                                val filtered = allProducts.filter {
-                                    it.name.contains(query, ignoreCase = true)
-                                }
-
-                                noProductsInclude.root.visibility =
-                                    if (filtered.isEmpty()) View.VISIBLE else View.GONE
-                                productAdapter.updateData(filtered)
-                            }
-                        }
-                    }
-                }
-            })
             ivClearText.setOnClickListener {
                 resetSearch()
             }
@@ -124,19 +91,80 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         }
     }
 
-    private fun resetSearch() {
-        with(binding){
-        etSearch.setText("")
-        noProductsInclude.root.visibility = View.GONE
-        displayedProducts.clear()
+    private fun loadInitialData() {
+        searchViewModel.loadProductsFromJson(requireContext())
         loadMoreProducts()
+    }
+
+    private fun createScrollListener() = object : RecyclerView.OnScrollListener() {
+        override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
+            handleScrollTopButtonVisibility(rv)
+            handlePagination()
         }
+    }
+
+    private fun handleScrollTopButtonVisibility(rv: RecyclerView) {
+        if (!rv.canScrollVertically(-1)) {
+            binding.btnScrollTop.hide()
+        } else {
+            binding.btnScrollTop.show()
+        }
+    }
+
+    private fun handlePagination() {
+        val isAtBottom = layoutManager.findLastCompletelyVisibleItemPosition() == displayedProducts.size - 1
+        if (!isLoading && isAtBottom && searchViewModel.hasMoreItems()) {
+            loadMoreProducts()
+        }
+    }
+
+    private fun handleSearchTextChange(text: String) {
+        val query = text.trim()
+        binding.ivClearText.visibility = if (query.isEmpty()) View.GONE else View.VISIBLE
+
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
+        searchRunnable = Runnable {
+            if (query.length < MIN_SEARCH_LENGTH && query.isNotEmpty()) {
+                handleSearchReset()
+            } else {
+                performSearch(query)
+            }
+        }
+        searchRunnable?.let { 
+            searchHandler.postDelayed(it, SEARCH_DEBOUNCE_MS)
+        }
+    }
+
+    private fun handleSearchReset() {
+        binding.noProductsInclude.root.visibility = View.GONE
+    }
+
+    private fun performSearch(query: String) {
+        val filteredProducts = searchViewModel.filterProducts(query)
+        val shouldShowNoResults = searchViewModel.shouldShowNoResults(filteredProducts, query)
+        
+        binding.noProductsInclude.root.visibility = 
+            if (shouldShowNoResults) View.VISIBLE else View.GONE
+        
+        searchViewModel.updateSourceList(filteredProducts)
+        displayedProducts.clear()
+        productAdapter.notifyDataSetChanged()
+        loadMoreProducts()
+    }
+
+    private fun resetSearch() {
+        binding.etSearch.setText("")
+        binding.noProductsInclude.root.visibility = View.GONE
+        searchViewModel.resetToAllProducts()
+        displayedProducts.clear()
+        productAdapter.notifyDataSetChanged()
+        loadMoreProducts()
     }
 
     private fun showProductDetailsBottomSheet(product: Product) {
         val dialog = BottomSheetDialog(requireContext())
-        val binding = CardProductBinding.inflate(LayoutInflater.from(requireContext()))
-        with(binding) {
+        val bottomSheetBinding = CardProductBinding.inflate(LayoutInflater.from(requireContext()))
+        with(bottomSheetBinding) {
             productData(product)
             dialog.setContentView(root)
             showProduct.visibility = View.GONE
@@ -145,29 +173,31 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun loadMoreProducts() {
-        if (isLoading) return
+        if (isLoading || !searchViewModel.hasMoreItems()) return
+        
         isLoading = true
-        with(binding) {
-            progressBar.visibility = View.VISIBLE
+        showLoadingIndicator(true)
 
-            Handler(Looper.getMainLooper()).postDelayed({
-                val currentSize = displayedProducts.size
-                val nextIndex = currentSize
-                val endIndex = (nextIndex + 10).coerceAtMost(allProducts.size)
+        Handler(Looper.getMainLooper()).postDelayed({
+            val currentSize = displayedProducts.size
+            val newItems = searchViewModel.getNextPageItems()
 
-                if (nextIndex < endIndex) {
-                    val newItems = allProducts.subList(nextIndex, endIndex)
-                    displayedProducts.addAll(newItems)
-                    productAdapter.notifyItemRangeInserted(currentSize, newItems.size)
-                }
+            if (newItems.isNotEmpty()) {
+                displayedProducts.addAll(newItems)
+                productAdapter.notifyItemRangeInserted(currentSize, newItems.size)
+            }
 
-                progressBar.visibility = View.GONE
-                isLoading = false
-
-            }, 1000)
-        }
-
+            showLoadingIndicator(false)
+            isLoading = false
+        }, LOAD_DELAY_MS)
     }
 
-
+    private fun showLoadingIndicator(show: Boolean) {
+        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+    }
+    
+    override fun onDestroyView() {
+        super.onDestroyView()
+        searchRunnable?.let { searchHandler.removeCallbacks(it) }
+    }
 }
