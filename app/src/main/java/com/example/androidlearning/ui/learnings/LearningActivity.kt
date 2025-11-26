@@ -10,6 +10,14 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.androidlearning.R
+import com.example.androidlearning.base.constants.Constants.CANCEL
+import com.example.androidlearning.base.constants.Constants.CLICK_NO
+import com.example.androidlearning.base.constants.Constants.CLICK_YES
+import com.example.androidlearning.base.constants.Constants.DIALOG_BOX
+import com.example.androidlearning.base.constants.Constants.EXIT_MESSAGE
+import com.example.androidlearning.base.constants.Constants.NO
+import com.example.androidlearning.base.constants.Constants.YES
+import com.example.androidlearning.databinding.ActivityLearningBinding
 import com.example.androidlearning.ui.login.ConstraintLoginActivity
 import com.example.androidlearning.ui.login.LinearLoginActivity
 import com.example.androidlearning.ui.login.RelativeLoginActivity
@@ -17,52 +25,32 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 
 class LearningActivity: AppCompatActivity() {
+    lateinit var binding: ActivityLearningBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_learning)
-//        binding = HomeBinding.inflate(layoutInflater)
-//        setContentView(binding.root)
-//
-//        with (binding) {
-//            linearlayout.setOnClickListener {
-//
-//            }
-//            relativelayout.setOnClickListener {
-//
-//            }
-//            constraintlayout.setOnClickListener {
-//
-//            }
-//            showButton.setOnClickListener {
-//
-//            }
-//        }
+        binding = ActivityLearningBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val linear = findViewById<Button>(R.id.linearlayout)
-        val relative = findViewById<Button>(R.id.relativelayout)
-        val constraint = findViewById<Button>(R.id.constraintlayout)
-        val showDialog=findViewById<MaterialButton>(R.id.show_button)
-        val dialogButton=findViewById<MaterialButton>(R.id.dialog_button)
-        showDialog.setOnClickListener {
+        binding.dialogButton.setOnClickListener {
             showBottomSheet()
         }
-        linear.setOnClickListener {
+        binding.linearlayout.setOnClickListener {
             startActivity(Intent(this, LinearLoginActivity::class.java))
         }
-        relative.setOnClickListener {
+        binding.relativelayout.setOnClickListener {
             startActivity(Intent(this, RelativeLoginActivity::class.java))
         }
-        constraint.setOnClickListener {
+        binding.constraintlayout.setOnClickListener {
             startActivity(Intent(this, ConstraintLoginActivity::class.java))
         }
-        dialogButton.setOnClickListener {
+        binding.dialogButton.setOnClickListener {
             showDialogBox()
         }
     }
     fun showBottomSheet(){
         val dialog= BottomSheetDialog(this)
-        val dialogView= LayoutInflater.from(this).inflate(R.layout.customsheet_bottom,null)
+        val dialogView= LayoutInflater.from(this).inflate(R.layout.card_product,null)
         val btn1=dialogView.findViewById<Button>(R.id.btn_close1)
         val btn2=dialogView.findViewById<Button>(R.id.btn_close2)
         val closeBtn=dialogView.findViewById<ImageView>(R.id.iv_close)
@@ -82,15 +70,16 @@ class LearningActivity: AppCompatActivity() {
     }
     fun showDialogBox() {
         AlertDialog.Builder(this)
-            .setTitle("Dialog Box")
-            .setMessage("Are you sure you want to exit?")
-            .setPositiveButton("Yes") { dialog, _ ->
-                Toast.makeText(this, "Clicked Yes", Toast.LENGTH_SHORT).show()
+            .setTitle(DIALOG_BOX)
+            .setMessage(EXIT_MESSAGE)
+            .setPositiveButton(YES) { _, _ ->
+                Toast.makeText(this, CLICK_YES, Toast.LENGTH_SHORT).show()
+              finishAffinity()
             }
-            .setNegativeButton("No") { _, _ ->
-                Toast.makeText(this, "Clicked No", Toast.LENGTH_SHORT).show()
+            .setNegativeButton(NO) { _, _ ->
+                Toast.makeText(this, CLICK_NO, Toast.LENGTH_SHORT).show()
             }
-            .setNeutralButton("Cancel") { dialog, _ ->
+            .setNeutralButton(CANCEL) { dialog, _ ->
                 dialog.dismiss()
             }
             .show()

@@ -1,4 +1,4 @@
-package com.example.androidlearning.model
+package com.example.androidlearning.data.model
 
 data class Price(
     val priceDisplay: String,

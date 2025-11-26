@@ -15,5 +15,17 @@
     <dimen name="five_dp">5dp</dimen>
     <dimen name="very_low_dimen">40dp</dimen>
     <dimen name="shop_icon_size">20dp</dimen>
-
+    <dimen name="activity_padding">16dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="search_bar_height">40dp</dimen>
+    <dimen name="search_bar_text_size">15sp</dimen>
+    <dimen name="clear_icon_size">15dp</dimen>
+    <dimen name="clear_icon_padding">1dp</dimen>
+    <dimen name="search_icon_size">30dp</dimen>
+    <dimen name="search_icon_margin_end">8dp</dimen>
+    <dimen name="search_icon_padding">8dp</dimen>
+    <dimen name="recycler_view_margin_top">5dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_max_image_size">30dp</dimen>
+    <dimen name="progressbar_margin_bottom">16dp</dimen>
 </resources>

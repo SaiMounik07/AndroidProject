@@ -12,6 +12,7 @@ constraintlayout = "2.2.1"
 recyclerview = "1.4.0"
 glide="4.16.0"
 gson="2.10.1"
+navigationFragment = "2.9.6"
 
 [libraries]
 gson={module="com.google.code.gson:gson",version.ref="gson"}
@@ -25,6 +26,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
+androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

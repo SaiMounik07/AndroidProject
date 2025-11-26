@@ -3,6 +3,6 @@
     <string name="login_hint">Nomor HP atau email</string>
     <string name="login_text">Log In</string>
     <string name="login_others">Log in Lebih cepat degan</string>
-
-
+    <string name="search_hint">Cari brand, produk, atau seller</string>
+    <string name="scroll_to_top">Scroll to top</string>
 </resources>

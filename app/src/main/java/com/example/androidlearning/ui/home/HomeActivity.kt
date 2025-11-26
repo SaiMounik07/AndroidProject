@@ -8,6 +8,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.androidlearning.R
+import com.example.androidlearning.base.constants.Constants.GUEST
+import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.ui.learnings.LearningActivity
 import com.example.androidlearning.ui.search.SearchActivity
 import com.google.android.material.button.MaterialButton
@@ -22,7 +24,7 @@ class HomeActivity:AppCompatActivity() {
         val logout=findViewById<MaterialButton>(R.id.mb_logout)
         val searchPage=findViewById<MaterialButton>(R.id.search_page)
         homeViewModel= ViewModelProvider(this).get(HomeViewModel::class.java)
-        val username=homeViewModel.getValueByKey("username","Guest")
+        val username=homeViewModel.getValueByKey(USERNAME,GUEST)
         text.setText("Hello $username")
         logout.setOnClickListener {
             homeViewModel.clearData()

@@ -4,6 +4,8 @@ import android.content.Intent
 import android.widget.EditText
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import com.example.androidlearning.base.constants.Constants.PASSWORD
+import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.data.repository.MainRepository
 
 class ConstraintViewModel : ViewModel() {
@@ -22,10 +24,11 @@ class ConstraintViewModel : ViewModel() {
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ) {
-        val username: String = mainRepository.getValueByKey("username", name).toString()
-        val passwordFromRepository: String = mainRepository.getValueByKey("password", password).toString()
+        val username: String = mainRepository.getValueByKey(USERNAME, name).toString()
+        val passwordFromRepository: String = mainRepository.getValueByKey(PASSWORD, password).toString()
         if (!name.isEmpty() && name == username && !password.isEmpty() && password == passwordFromRepository) {
             onSuccess.invoke()
+
         } else {
             onFailure.invoke()
         }

@@ -1,4 +1,4 @@
-package com.example.androidlearning.util
+package com.example.androidlearning.base.utils
 
 import android.app.Activity
 import android.content.Context

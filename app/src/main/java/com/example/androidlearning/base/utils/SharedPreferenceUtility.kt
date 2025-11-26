@@ -1,10 +1,10 @@
-package com.example.androidlearning.util
+package com.example.androidlearning.base.utils
 
 import android.content.Context
 import com.example.androidlearning.App
 
 class SharedPreferenceUtility(name:String) {
-    private val sharedPreference=App.instance.getSharedPreferences(name, Context.MODE_PRIVATE)
+    private val sharedPreference= App.instance.getSharedPreferences(name, Context.MODE_PRIVATE)
     private val edit=sharedPreference.edit()
 
 
