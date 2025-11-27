@@ -220,6 +220,7 @@
         android:layout_marginStart="6dp"
         app:constraint_referenced_ids="iv_official_icon,iv_diamond_icon,tv_store_name"
         app:flow_horizontalGap="1dp"
+        android:layout_marginVertical="4dp"
         app:flow_horizontalStyle="packed"
         app:flow_wrapMode="none"
         app:layout_constraintStart_toEndOf="@id/iv_product_image"

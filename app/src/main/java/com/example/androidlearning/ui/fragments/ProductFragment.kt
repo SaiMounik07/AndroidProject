@@ -1,5 +1,6 @@
 package com.example.androidlearning.ui.fragments
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -22,6 +23,7 @@ import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.ui.search.ProductAdapter
 import com.example.androidlearning.ui.search.SearchViewModel
 import com.example.androidlearning.ui.search.productData
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 
 class ProductFragment : Fragment(R.layout.search_fragment) {
@@ -43,7 +45,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         setupRecyclerView()
         setupSearchListeners()
         setupClickListeners()
-        loadInitialData()
+        loadInitialData(true)
     }
 
     private fun setupRecyclerView() {
@@ -90,8 +92,15 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             ivToggleView.setOnClickListener {
                 toggleViewType()
             }
+            fabAddProduct.setOnClickListener {
+                navigateToAddProduct()
+            }
         }
-
+    }
+    
+    private fun navigateToAddProduct() {
+        val intent = android.content.Intent(requireContext(), com.example.androidlearning.ui.addproduct.AddProductActivity::class.java)
+        startActivity(intent)
     }
 
     private fun toggleViewType() {
@@ -110,8 +119,8 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         binding.recyclerView.addOnScrollListener(createScrollListener())
     }
 
-    private fun loadInitialData() {
-        searchViewModel.loadProductsFromJson(requireContext())
+    private fun loadInitialData(flag: Boolean) {
+        searchViewModel.loadProductsFromJson(requireContext(),flag)
         loadMoreProducts()
     }
 
@@ -123,7 +132,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun handleScrollTopButtonVisibility(rv: RecyclerView) {
-        if (!rv.canScrollVertically(-1)) {
+        if (!rv.canScrollVertically(-1) || isLoading) {
             binding.btnScrollTop.hide()
         } else {
             binding.btnScrollTop.show()
@@ -187,6 +196,11 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             productData(product)
             dialog.setContentView(root)
             showProduct.visibility = View.GONE
+        }
+        val bottomSheet = dialog.behavior
+        dialog.setOnShowListener {
+            bottomSheet.peekHeight = Resources.getSystem().displayMetrics.heightPixels
+            bottomSheet.state = BottomSheetBehavior.STATE_EXPANDED
         }
         dialog.show()
     }

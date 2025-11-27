@@ -100,7 +100,21 @@
         app:tint="@android:color/white"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
+        android:visibility="gone"
         app:maxImageSize="@dimen/fab_max_image_size"
+        app:layout_constraintBottom_toTopOf="@id/fab_add_product"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_add_product"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_input_add"
+        android:contentDescription="Add Product"
+        app:backgroundTint="@color/blibliBlue"
+        app:tint="@android:color/white"
+        android:layout_margin="@dimen/fab_margin"
+        android:clickable="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
         <include

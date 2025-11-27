@@ -2,6 +2,7 @@ package com.example.androidlearning.base.utils
 
 import android.content.Context
 import com.example.androidlearning.App
+import com.example.androidlearning.base.constants.Constants.GUEST
 import com.example.androidlearning.data.model.Product
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -42,6 +43,4 @@ class SharedPreferenceUtility(name:String) {
         val type=object :TypeToken<List<Product>>(){}.type
         return gson.fromJson(json,type)?: emptyList()
     }
-
-
 }

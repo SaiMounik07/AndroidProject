@@ -19,16 +19,21 @@ class SearchViewModel: ViewModel() {
     private var allProducts: List<Product> = emptyList()
     private var currentSourceList: List<Product> = emptyList()
     private var loadedCount: Int = 0
-    val mainRepository: MainRepository?=null
-    fun loadProductsFromJson(context: Context) {
-        val json = context.assets.open(JSON_NAME)
-            .bufferedReader()
-            .use { it.readText() }
-        val gson = Gson()
-        val type = object : TypeToken<List<Product>>() {}.type
-        val products: List<Product> = gson.fromJson(json, type)
-        allProducts = products
-        currentSourceList = products
+    val mainRepository: MainRepository= MainRepository()
+    fun loadProductsFromJson(context: Context,flag:Boolean) {
+        if (flag){
+            allProducts = getProducts()
+            currentSourceList = getProducts()
+        }else {
+            val json = context.assets.open(JSON_NAME)
+                .bufferedReader()
+                .use { it.readText() }
+            val gson = Gson()
+            val type = object : TypeToken<List<Product>>() {}.type
+            val products: List<Product> = gson.fromJson(json, type)
+            allProducts = products
+            currentSourceList = products
+        }
     }
     
     fun filterProducts(query: String): List<Product> {
@@ -70,12 +75,9 @@ class SearchViewModel: ViewModel() {
     fun shouldShowNoResults(filteredList: List<Product>, query: String): Boolean {
         return query.length >= MIN_SEARCH_LENGTH && filteredList.isEmpty()
     }
-    fun saveProduct(product: Product){
-        val username=mainRepository?.getValueByKey(USERNAME, GUEST)
-        mainRepository?.saveProduct(username.toString(),product)
-    }
     fun getProducts(): List<Product>{
-        val username=mainRepository?.getValueByKey(USERNAME, GUEST)
-        return mainRepository?.getProducts(username.toString())?: emptyList()
+        val username=mainRepository.getValueByKey(USERNAME, GUEST)
+        return mainRepository.getProducts(username.toString())
     }
+
 }
