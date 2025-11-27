@@ -23,19 +23,22 @@ class ConstraintLoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_constraint)
-        constraintViewModel = ViewModelProvider(this).get(ConstraintViewModel::class.java)
+        constraintViewModel = ViewModelProvider(this)[ConstraintViewModel::class.java]
         constraintViewModel.saveValues("username", "sai")
         constraintViewModel.saveValues("password", "sai")
         Toast.makeText(this, "Constraint Layout", Toast.LENGTH_SHORT).show()
         val username = findViewById<EditText>(R.id.userfield)
         val password = findViewById<EditText>(R.id.password_field)
         val loginButton = findViewById<MaterialButton>(R.id.loginbutton)
+        username.requestFocus()
+
 
         loginButton.setOnClickListener {
             loginClickCount++
             if (loginClickCount >= 1 && !username.text.toString().isEmpty()&& password.text.toString().isEmpty()) {
                 password.visibility = EditText.VISIBLE
                 username.isEnabled = false
+                password.requestFocus()
             } else {
                 constraintViewModel.validateLogin(
                     name = username.text.toString(),

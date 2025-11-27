@@ -2,6 +2,9 @@ package com.example.androidlearning.base.utils
 
 import android.content.Context
 import com.example.androidlearning.App
+import com.example.androidlearning.data.model.Product
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 
 class SharedPreferenceUtility(name:String) {
     private val sharedPreference= App.instance.getSharedPreferences(name, Context.MODE_PRIVATE)
@@ -20,5 +23,25 @@ class SharedPreferenceUtility(name:String) {
     fun clearSpecificData(key:String){
         edit.remove(key).apply()
     }
+    fun save(key:String,product:Product){
+        val gson = Gson()
+        val json = sharedPreference.getString(key, null)
+        val type = object : TypeToken<MutableList<Product>>() {}.type
+        val currentList: MutableList<Product> = if (json != null) {
+            gson.fromJson(json, type)
+        } else {
+            mutableListOf()
+        }
+        currentList.add(product)
+        val updatedJson = gson.toJson(currentList)
+        edit.putString(key, updatedJson).apply()
+    }
+    fun getProducts(key: String): List<Product> {
+        val gson=Gson()
+        val json=sharedPreference.getString(key,null)
+        val type=object :TypeToken<List<Product>>(){}.type
+        return gson.fromJson(json,type)?: emptyList()
+    }
+
 
 }

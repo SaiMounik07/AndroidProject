@@ -4,11 +4,14 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.androidlearning.base.constants.Constants.GUEST
 import com.example.androidlearning.base.constants.Constants.ITEMS_PER_PAGE
 import com.example.androidlearning.base.constants.Constants.JSON_NAME
 import com.example.androidlearning.base.constants.Constants.MIN_SEARCH_LENGTH
+import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.base.utils.KeyboardUtils
 import com.example.androidlearning.data.model.Product
+import com.example.androidlearning.data.repository.MainRepository
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -16,7 +19,7 @@ class SearchViewModel: ViewModel() {
     private var allProducts: List<Product> = emptyList()
     private var currentSourceList: List<Product> = emptyList()
     private var loadedCount: Int = 0
-
+    val mainRepository: MainRepository?=null
     fun loadProductsFromJson(context: Context) {
         val json = context.assets.open(JSON_NAME)
             .bufferedReader()
@@ -66,5 +69,13 @@ class SearchViewModel: ViewModel() {
     
     fun shouldShowNoResults(filteredList: List<Product>, query: String): Boolean {
         return query.length >= MIN_SEARCH_LENGTH && filteredList.isEmpty()
+    }
+    fun saveProduct(product: Product){
+        val username=mainRepository?.getValueByKey(USERNAME, GUEST)
+        mainRepository?.saveProduct(username.toString(),product)
+    }
+    fun getProducts(): List<Product>{
+        val username=mainRepository?.getValueByKey(USERNAME, GUEST)
+        return mainRepository?.getProducts(username.toString())?: emptyList()
     }
 }

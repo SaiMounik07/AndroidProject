@@ -31,7 +31,6 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     private var isLoading = false
     private lateinit var binding: SearchFragmentBinding
     private lateinit var searchViewModel: SearchViewModel
-    
     private var searchRunnable: Runnable? = null
     private val searchHandler = Handler(Looper.getMainLooper())
 
@@ -52,9 +51,9 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         with(binding.recyclerView) {
             this.layoutManager = this@ProductFragment.layoutManager
             visibility = View.VISIBLE
-            productAdapter = ProductAdapter(displayedProducts) { product ->
+            productAdapter = ProductAdapter(displayedProducts, { product ->
                 showProductDetailsBottomSheet(product)
-            }
+            }, isGridView = false)
             adapter = productAdapter
             addOnScrollListener(createScrollListener())
         }
@@ -88,7 +87,27 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             noProductsInclude.btnSearchAgain.setOnClickListener {
                 resetSearch()
             }
+            ivToggleView.setOnClickListener {
+                toggleViewType()
+            }
         }
+
+    }
+
+    private fun toggleViewType() {
+        val isCurrentlyGrid = layoutManager is androidx.recyclerview.widget.GridLayoutManager
+        
+        if (isCurrentlyGrid) {
+            layoutManager = LinearLayoutManager(requireContext())
+            binding.ivToggleView.setImageResource(R.drawable.linear)
+        } else {
+            layoutManager = androidx.recyclerview.widget.GridLayoutManager(requireContext(), 2)
+            binding.ivToggleView.setImageResource(R.drawable.gridview)
+        }
+        
+        binding.recyclerView.layoutManager = layoutManager
+        productAdapter.toggleViewType(!isCurrentlyGrid)
+        binding.recyclerView.addOnScrollListener(createScrollListener())
     }
 
     private fun loadInitialData() {

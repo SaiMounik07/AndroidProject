@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="@dimen/shop_icon_size"
+    android:height="@dimen/shop_icon_size"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path android:pathData="M4.5 2H8.5C9.88071 2 11 3.11929 11 4.5V8.5C11 9.88071 9.88071 11 8.5 11H4.5C3.11929 11 2 9.88071 2 8.5V4.5C2 3.11929 3.11929 2 4.5 2Z M15.5 2H19.5C20.8807 2 22 3.11929 22 4.5V8.5C22 9.88071 20.8807 11 19.5 11H15.5C14.1193 11 13 9.88071 13 8.5V4.5C13 3.11929 14.1193 2 15.5 2Z M8.5 13H4.5C3.11929 13 2 14.1193 2 15.5V19.5C2 20.8807 3.11929 22 4.5 22H8.5C9.88071 22 11 20.8807 11 19.5V15.5C11 14.1193 9.88071 13 8.5 13Z M15.5 13H19.5C20.8807 13 22 14.1193 22 15.5V19.5C22 20.8807 20.8807 22 19.5 22H15.5C14.1193 22 13 20.8807 13 19.5V15.5C13 14.1193 14.1193 13 15.5 13Z"
+        android:fillColor="@color/greyName"
+        android:strokeColor="@color/greyName"
+        >
+
+    </path>
+</vector>
