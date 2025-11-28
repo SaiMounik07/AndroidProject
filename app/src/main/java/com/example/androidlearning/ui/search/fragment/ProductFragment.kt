@@ -22,6 +22,7 @@ import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.databinding.CardProductBinding
 import com.example.androidlearning.databinding.SearchFragmentBinding
 import com.example.androidlearning.ui.addproduct.AddProductActivity
+import com.example.androidlearning.ui.addproduct.fragment.AddProductFragment
 import com.example.androidlearning.ui.search.ProductAdapter
 import com.example.androidlearning.ui.search.SearchViewModel
 import com.example.androidlearning.ui.search.productData
@@ -81,11 +82,27 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun handleEditProduct(product: Product, position: Int) {
-        val intent = Intent(requireContext(), AddProductActivity::class.java).apply {
-            putExtra("PRODUCT_ID", product.name)
-            putExtra("EDIT_MODE", true)
+        val fragment = AddProductFragment()
+        val bundle = Bundle().apply {
+            putBoolean("EDIT_MODE", true)
+            putString("PRODUCT_NAME", product.name)
+            putString("PRODUCT_BRAND", product.brand)
+            putDouble("PRODUCT_SALE_PRICE", product.price.salePrice)
+            putDouble("PRODUCT_LIST_PRICE", product.price.listPrice)
+            putString("PRODUCT_LOCATION", product.location)
+            putString("PRODUCT_IMAGE", product.images.firstOrNull() ?: "")
+            putBoolean("PRODUCT_FREE_SHIPPING", product.tags.contains("FREE_SHIPPING"))
+            putBoolean("PRODUCT_FREE_GIFT", product.tags.contains("FREE_GIFT"))
+            putBoolean("PRODUCT_FLASH_SALE", product.tags.contains("FLASH_SALE_CAMPAIGN"))
+            putBoolean("PRODUCT_OFFICIAL_STORE", product.brand != "no brand")
+            putBoolean("PRODUCT_DIAMOND_STORE", product.badge.merchantBadge == "Diamond")
         }
-        startActivity(intent)
+        fragment.arguments = bundle
+        
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.home_page, fragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun handleDeleteProduct(product: Product, position: Int) {
@@ -154,8 +171,10 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun navigateToAddProduct() {
-        val intent = Intent(requireContext(), AddProductActivity::class.java)
-        startActivity(intent)
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.home_page, AddProductFragment())
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun toggleViewType() {
@@ -287,6 +306,31 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
 
     private fun showLoadingIndicator(show: Boolean) {
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+    }
+
+
+    override fun onResume() {
+        super.onResume()
+        // Reload data when returning to this fragment
+        refreshProductList()
+    }
+
+    private fun refreshProductList() {
+        displayedProducts.clear()
+        productAdapter.notifyDataSetChanged()
+        binding.etSearch.setText("")
+        binding.ivClearText.visibility = View.GONE
+        
+        searchViewModel.loadProductsFromJson(requireContext(), true)
+        searchViewModel.resetToAllProducts()
+        
+        loadMoreProducts()
+        
+        if (displayedProducts.isEmpty() && !isLoading) {
+            binding.noProductsInclude.root.visibility = View.VISIBLE
+        } else {
+            binding.noProductsInclude.root.visibility = View.GONE
+        }
     }
 
     override fun onDestroyView() {

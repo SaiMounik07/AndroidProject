@@ -1,4 +1,4 @@
-package com.example.androidlearning.ui.addproduct
+package com.example.androidlearning.ui.addproduct.fragment
 
 import android.Manifest
 import android.app.Activity
@@ -10,56 +10,57 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
-import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.androidlearning.R
-import com.example.androidlearning.databinding.ActivityAddProductBinding
 import com.example.androidlearning.data.model.Badge
 import com.example.androidlearning.data.model.Price
 import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.data.model.Review
-import com.example.androidlearning.ui.search.SearchActivity
+import com.example.androidlearning.databinding.ActivityAddProductBinding
+import com.example.androidlearning.ui.addproduct.AddProductViewModel
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.delay
 import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
 
-class AddProductActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityAddProductBinding
+class AddProductFragment : Fragment() {
+    private var _binding: ActivityAddProductBinding? = null
+    private val binding get() = _binding!!
     private lateinit var viewModel: AddProductViewModel
     private var selectedImageUrl: String? = null
     private var capturedImageUri: Uri? = null
+
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_OK) {
+        if (result.resultCode == Activity.RESULT_OK) {
             result.data?.data?.let { uri ->
                 selectedImageUrl = uri.toString()
                 displayImage(uri)
-                Toast.makeText(this, "Image selected from gallery", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Image selected from gallery", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_OK) {
+        if (result.resultCode == Activity.RESULT_OK) {
             capturedImageUri?.let { uri ->
                 selectedImageUrl = uri.toString()
                 displayImage(uri)
-                Toast.makeText(this, "Photo captured", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Photo captured", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -70,7 +71,7 @@ class AddProductActivity : AppCompatActivity() {
         if (isGranted) {
             openCamera()
         } else {
-            Toast.makeText(this, "Camera permission denied. Using placeholder instead.", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Camera permission denied. Using placeholder instead.", Toast.LENGTH_LONG).show()
             usePlaceholderImage()
         }
     }
@@ -81,60 +82,70 @@ class AddProductActivity : AppCompatActivity() {
         if (isGranted) {
             openGallery()
         } else {
-            Toast.makeText(this, "Storage permission denied. Using placeholder instead.", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Storage permission denied. Using placeholder instead.", Toast.LENGTH_LONG).show()
             usePlaceholderImage()
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        binding = ActivityAddProductBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = ActivityAddProductBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         viewModel = ViewModelProvider(this)[AddProductViewModel::class.java]
+
         with(binding) {
-            binding.etListPrice.addTextChangedListener {
+            etListPrice.addTextChangedListener {
                 val listPriceText = it.toString()
                 val salePriceText = etSalePrice.text.toString()
                 if (listPriceText.isNotEmpty() && salePriceText.isNotEmpty()) {
                     viewModel.getDiscountPrice(listPriceText.toDouble(), salePriceText.toDouble())
                 }
             }
-            viewModel.discountPercent.observe( this@AddProductActivity) { value ->
+            viewModel.discountPercent.observe(viewLifecycleOwner) { value ->
                 etDiscountPercent.setText("${value.toInt()} %")
             }
         }
 
-        if (intent.getBooleanExtra("EDIT_MODE", false)) {
-            preFillProductData()
-            binding.tvHeader.text = "Edit Product"
-            binding.btnSave.text = "Update Product"
+        // Check if in edit mode and pre-fill data
+        arguments?.let { args ->
+            if (args.getBoolean("EDIT_MODE", false)) {
+                preFillProductData(args)
+                binding.tvHeader.text = "Edit Product"
+                binding.btnSave.text = "Update Product"
+            }
         }
 
         setupClickListeners()
     }
 
-    private fun preFillProductData() {
+    private fun preFillProductData(args: Bundle) {
         with(binding) {
-            etProductName.setText(intent.getStringExtra("PRODUCT_NAME") ?: "")
-            etBrand.setText(intent.getStringExtra("PRODUCT_BRAND") ?: "")
-            etSalePrice.setText(intent.getDoubleExtra("PRODUCT_SALE_PRICE", 0.0).toString())
-            
-            val listPrice = intent.getDoubleExtra("PRODUCT_LIST_PRICE", 0.0)
+            etProductName.setText(args.getString("PRODUCT_NAME") ?: "")
+            etBrand.setText(args.getString("PRODUCT_BRAND") ?: "")
+            etSalePrice.setText(args.getDouble("PRODUCT_SALE_PRICE", 0.0).toString())
+
+            val listPrice = args.getDouble("PRODUCT_LIST_PRICE", 0.0)
             if (listPrice > 0.0) {
                 etListPrice.setText(listPrice.toString())
             }
-            
-            etLocation.setText(intent.getStringExtra("PRODUCT_LOCATION") ?: "")
-            
-            cbFreeShipping.isChecked = intent.getBooleanExtra("PRODUCT_FREE_SHIPPING", false)
-            cbFreeGift.isChecked = intent.getBooleanExtra("PRODUCT_FREE_GIFT", false)
-            cbFlashSale.isChecked = intent.getBooleanExtra("PRODUCT_FLASH_SALE", false)
-            cbOfficialStore.isChecked = intent.getBooleanExtra("PRODUCT_OFFICIAL_STORE", false)
-            cbDiamondStore.isChecked = intent.getBooleanExtra("PRODUCT_DIAMOND_STORE", false)
-            
-            val imageUrl = intent.getStringExtra("PRODUCT_IMAGE")
+
+            etLocation.setText(args.getString("PRODUCT_LOCATION") ?: "")
+
+            cbFreeShipping.isChecked = args.getBoolean("PRODUCT_FREE_SHIPPING", false)
+            cbFreeGift.isChecked = args.getBoolean("PRODUCT_FREE_GIFT", false)
+            cbFlashSale.isChecked = args.getBoolean("PRODUCT_FLASH_SALE", false)
+            cbOfficialStore.isChecked = args.getBoolean("PRODUCT_OFFICIAL_STORE", false)
+            cbDiamondStore.isChecked = args.getBoolean("PRODUCT_DIAMOND_STORE", false)
+
+            val imageUrl = args.getString("PRODUCT_IMAGE")
             if (!imageUrl.isNullOrEmpty()) {
                 selectedImageUrl = imageUrl
                 displayImage(imageUrl)
@@ -149,7 +160,7 @@ class AddProductActivity : AppCompatActivity() {
             }
 
             btnCancel.setOnClickListener {
-                finish()
+                parentFragmentManager.popBackStack()
             }
 
             btnSave.setOnClickListener {
@@ -163,8 +174,8 @@ class AddProductActivity : AppCompatActivity() {
 
     private fun showImageSourceDialog() {
         val options = arrayOf("Take Photo", "Choose from Gallery", "Use Placeholder")
-        
-        AlertDialog.Builder(this)
+
+        AlertDialog.Builder(requireContext())
             .setTitle("Add Product Image")
             .setItems(options) { _, which ->
                 when (which) {
@@ -180,7 +191,7 @@ class AddProductActivity : AppCompatActivity() {
     private fun checkCameraPermissionAndOpen() {
         when {
             ContextCompat.checkSelfPermission(
-                this,
+                requireContext(),
                 Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED -> {
                 openCamera()
@@ -199,7 +210,7 @@ class AddProductActivity : AppCompatActivity() {
         }
 
         when {
-            ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED -> {
                 openGallery()
             }
             else -> {
@@ -210,18 +221,19 @@ class AddProductActivity : AppCompatActivity() {
 
     private fun openCamera() {
         try {
-            val photoFile = File(cacheDir, "product_${System.currentTimeMillis()}.jpg")
+            val photoFile =
+                File(requireContext().cacheDir, "product_${System.currentTimeMillis()}.jpg")
             capturedImageUri = FileProvider.getUriForFile(
-                this,
-                "${packageName}.fileprovider",
+                requireContext(),
+                "${requireContext().packageName}.fileprovider",
                 photoFile
             )
-            
+
             val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
             intent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri)
             cameraLauncher.launch(intent)
         } catch (e: Exception) {
-            Toast.makeText(this, "Camera not available: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Camera not available: ${e.message}", Toast.LENGTH_SHORT).show()
             usePlaceholderImage()
         }
     }
@@ -239,17 +251,17 @@ class AddProductActivity : AppCompatActivity() {
             "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/medium/catalog-image/MTA-15958002/b29_groceries_-_b29_power_water_solution_detergent_bubuk_-777_g-_x_2_pcs_full01_txjzn8y3.jpg",
             "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/medium/catalog-image/114/MTA-176963586/tidak_ada_merk_tas_jaring_belanja_jumbo_penyimpan_sayur_buah_bawang_groceries_bag_kantong_multifungsi_full01_kpf6ianv.jpg"
         )
-        
+
         selectedImageUrl = placeholderUrls.random()
         displayImage(selectedImageUrl!!)
-        Toast.makeText(this, "Placeholder image added", Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), "Placeholder image added", Toast.LENGTH_SHORT).show()
     }
 
     private fun displayImage(imageSource: Any) {
-        binding.ivAddPlaceholder.visibility = android.view.View.GONE
-        binding.tvAddImageText.visibility = android.view.View.GONE
-        binding.ivProductPreview.visibility = android.view.View.VISIBLE
-        
+        binding.ivAddPlaceholder.visibility = View.GONE
+        binding.tvAddImageText.visibility = View.GONE
+        binding.ivProductPreview.visibility = View.VISIBLE
+
         Glide.with(this)
             .load(imageSource)
             .placeholder(R.drawable.img_1)
@@ -310,7 +322,7 @@ class AddProductActivity : AppCompatActivity() {
             val salePrice = etSalePrice.text.toString().toDouble()
             val listPrice = etListPrice.text.toString().toDoubleOrNull() ?: salePrice
             val location = etLocation.text.toString().ifBlank { "Unknown" }
-            viewModel.getDiscountPrice(listPrice,salePrice)
+            viewModel.getDiscountPrice(listPrice, salePrice)
 
             val discount = if (listPrice > salePrice) {
                 ((listPrice - salePrice) / listPrice * 100).toInt()
@@ -356,7 +368,7 @@ class AddProductActivity : AppCompatActivity() {
                 cbOfficialStore.isChecked -> "Gold"
                 else -> "None"
             }
-            
+
             val merchantBadgeUrl = when (merchantBadge) {
                 "Diamond" -> "https://www.static-src.com//siva/asset/06_2025/seller-diamond.png"
                 "Gold" -> "https://www.static-src.com//siva/asset/06_2025/seller-gold.png"
@@ -387,54 +399,65 @@ class AddProductActivity : AppCompatActivity() {
 
     private fun formatPrice(price: Double): String {
         val formatter = NumberFormat.getNumberInstance(Locale("in", "ID"))
-        return formatter.format(price.toInt())    }
+        return formatter.format(price.toInt())
+    }
 
     private fun saveProduct(product: Product) {
-        val isEditMode = intent.getBooleanExtra("EDIT_MODE", false)
-        
+        val isEditMode = arguments?.getBoolean("EDIT_MODE", false) ?: false
+
         if (isEditMode) {
-            // Always delete the old product in edit mode
-            val oldProductName = intent.getStringExtra("PRODUCT_NAME") ?: ""
+            val oldProductName = arguments?.getString("PRODUCT_NAME") ?: ""
             if (oldProductName.isNotEmpty()) {
                 val oldProduct = createProductFromOldData(oldProductName)
                 viewModel.deleteProduct(oldProduct)
             }
         }
-        
+
         viewModel.saveProduct(product)
-        
+
         val message = if (isEditMode) "Product updated: ${product.name}" else "Product saved: ${product.name}"
-        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).setAction("UNDO"){
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).setAction("UNDO") {
             viewModel.deleteProduct(product)
             if (isEditMode) {
-                // Restore the old product if undo is clicked
-                val oldProductName = intent.getStringExtra("PRODUCT_NAME") ?: ""
+                val oldProductName = arguments?.getString("PRODUCT_NAME") ?: ""
                 if (oldProductName.isNotEmpty()) {
                     val oldProduct = createProductFromOldData(oldProductName)
                     viewModel.saveProduct(oldProduct)
                 }
             }
         }.show()
-        
+
         Handler(Looper.getMainLooper()).postDelayed({
-            startActivity(Intent(this, SearchActivity::class.java))
-            finish()
+            parentFragmentManager.popBackStack()
         }, 1000)
     }
-    
+
     private fun createProductFromOldData(oldName: String): Product {
-        val salePrice = intent.getDoubleExtra("PRODUCT_SALE_PRICE", 0.0)
-        val listPrice = intent.getDoubleExtra("PRODUCT_LIST_PRICE", 0.0)
-        val brand = intent.getStringExtra("PRODUCT_BRAND") ?: "no brand"
-        val location = intent.getStringExtra("PRODUCT_LOCATION") ?: "Unknown"
-        val imageUrl = intent.getStringExtra("PRODUCT_IMAGE") ?: ""
-        
+        val args = arguments ?: return Product(
+            name = oldName,
+            price = Price("", "", 0, 0.0, 0.0, "", false, 0.0, 0.0),
+            brand = "no brand",
+            review = Review(0, 0, 0.0, 0.0, true),
+            tags = emptyList(),
+            location = "",
+            badge = Badge("", "", "", ""),
+            soldCountTotal = 0,
+            uspLabelsTags = emptyList(),
+            images = emptyList()
+        )
+
+        val salePrice = args.getDouble("PRODUCT_SALE_PRICE", 0.0)
+        val listPrice = args.getDouble("PRODUCT_LIST_PRICE", 0.0)
+        val brand = args.getString("PRODUCT_BRAND") ?: "no brand"
+        val location = args.getString("PRODUCT_LOCATION") ?: "Unknown"
+        val imageUrl = args.getString("PRODUCT_IMAGE") ?: ""
+
         val discount = if (listPrice > salePrice) {
             ((listPrice - salePrice) / listPrice * 100).toInt()
         } else {
             0
         }
-        
+
         val price = Price(
             priceDisplay = "Rp${formatPrice(salePrice)}",
             strikeThroughPriceDisplay = if (discount > 0) "Rp${formatPrice(listPrice)}" else "",
@@ -446,31 +469,31 @@ class AddProductActivity : AppCompatActivity() {
             listPrice = listPrice,
             salePrice = salePrice
         )
-        
+
         val tags = mutableListOf<String>()
-        if (intent.getBooleanExtra("PRODUCT_FREE_SHIPPING", false)) tags.add("FREE_SHIPPING")
-        if (intent.getBooleanExtra("PRODUCT_FREE_GIFT", false)) tags.add("FREE_GIFT")
-        if (intent.getBooleanExtra("PRODUCT_FLASH_SALE", false)) tags.add("FLASH_SALE_CAMPAIGN")
-        
+        if (args.getBoolean("PRODUCT_FREE_SHIPPING", false)) tags.add("FREE_SHIPPING")
+        if (args.getBoolean("PRODUCT_FREE_GIFT", false)) tags.add("FREE_GIFT")
+        if (args.getBoolean("PRODUCT_FLASH_SALE", false)) tags.add("FLASH_SALE_CAMPAIGN")
+
         val merchantBadge = when {
-            intent.getBooleanExtra("PRODUCT_DIAMOND_STORE", false) -> "Diamond"
-            intent.getBooleanExtra("PRODUCT_OFFICIAL_STORE", false) -> "Gold"
+            args.getBoolean("PRODUCT_DIAMOND_STORE", false) -> "Diamond"
+            args.getBoolean("PRODUCT_OFFICIAL_STORE", false) -> "Gold"
             else -> "None"
         }
-        
+
         val merchantBadgeUrl = when (merchantBadge) {
             "Diamond" -> "https://www.static-src.com//siva/asset/06_2025/seller-diamond.png"
             "Gold" -> "https://www.static-src.com//siva/asset/06_2025/seller-gold.png"
             else -> ""
         }
-        
+
         val badge = Badge(
             logisticBadge_stock = if (tags.contains("FREE_SHIPPING")) "2HD" else "",
             merchantBadgeUrl = merchantBadgeUrl,
             merchantBadge = merchantBadge,
             logisticBadge = if (tags.contains("FREE_SHIPPING")) "2HD" else ""
         )
-        
+
         return Product(
             name = oldName,
             price = price,
@@ -483,5 +506,10 @@ class AddProductActivity : AppCompatActivity() {
             uspLabelsTags = tags,
             images = if (imageUrl.isNotEmpty()) listOf(imageUrl) else emptyList()
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
