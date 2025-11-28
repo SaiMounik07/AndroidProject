@@ -12,14 +12,14 @@ class AddProductViewModel : ViewModel() {
 
     val mainRepository: MainRepository= MainRepository()
 
-    private val _discountPercent= MutableLiveData<Int>()
-    val discountPercent: LiveData<Int> = _discountPercent
+    private val _discountPercent= MutableLiveData<Double>()
+    val discountPercent: LiveData<Double> = _discountPercent
 
-    fun getDiscountPrice(listPrice:Int,salePrice:Int){
+    fun getDiscountPrice(listPrice:Double,salePrice:Double){
         _discountPercent.value=if (listPrice > salePrice) {
-            ((listPrice - salePrice).toDouble() / listPrice * 100).toInt()
+            ((listPrice - salePrice) / listPrice * 100)
         } else {
-            0
+            0.0
         }
     }
     fun saveProduct(product: Product){

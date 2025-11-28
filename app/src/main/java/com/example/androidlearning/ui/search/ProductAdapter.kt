@@ -15,7 +15,9 @@ import com.example.androidlearning.data.model.Product
 class ProductAdapter(
     private var products: List<Product>, 
     private val onProductClick: (Product) -> Unit,
-    private var isGridView: Boolean = false
+    private var isGridView: Boolean = false,
+    private val onEditClick: ((Product, Int) -> Unit)? = null,
+    private val onDeleteClick: ((Product, Int) -> Unit)? = null
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
     
     companion object {
@@ -48,8 +50,8 @@ class ProductAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val product = products[position]
         when (holder) {
-            is ListViewHolder -> holder.binding.productData(product,onProductClick)
-            is GridViewHolder -> holder.binding.productDataGrid(product, onProductClick)
+            is ListViewHolder -> holder.binding.productData(product, onProductClick, onEditClick, onDeleteClick, position)
+            is GridViewHolder -> holder.binding.productDataGrid(product, onProductClick, onEditClick, onDeleteClick, position)
         }
     }
 
@@ -67,7 +69,13 @@ class ProductAdapter(
     }
 }
 
-fun CardProductBinding.productData(product: Product, onProductClick: (Product) -> Unit = {}) {
+fun CardProductBinding.productData(
+    product: Product, 
+    onProductClick: (Product) -> Unit = {},
+    onEditClick: ((Product, Int) -> Unit)? = null,
+    onDeleteClick: ((Product, Int) -> Unit)? = null,
+    position: Int = 0
+) {
 
     if (!product.name.isEmpty()) {
         productName.text = product.name
@@ -138,16 +146,39 @@ fun CardProductBinding.productData(product: Product, onProductClick: (Product) -
             .load(product.images.firstOrNull())
             .error(R.drawable.img_1)
             .into(ivProductImage)
-
         showProduct.setOnClickListener {
             onProductClick(product)
         }
         showProduct.setOnClickListener {
             onProductClick(product)
+        }
+        ivMenu.setOnClickListener { view ->
+            val popup = android.widget.PopupMenu(view.context, view)
+            popup.menuInflater.inflate(R.menu.product_menu, popup.menu)
+            popup.setOnMenuItemClickListener { menuItem ->
+                when (menuItem.itemId) {
+                    R.id.action_edit -> {
+                        onEditClick?.invoke(product, position)
+                        true
+                    }
+                    R.id.action_delete -> {
+                        onDeleteClick?.invoke(product, position)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
         }
     }
 }
-fun CardProductGridBinding.productDataGrid(product: Product, onProductClick: (Product) -> Unit = {}) {
+fun CardProductGridBinding.productDataGrid(
+    product: Product, 
+    onProductClick: (Product) -> Unit = {},
+    onEditClick: ((Product, Int) -> Unit)? = null,
+    onDeleteClick: ((Product, Int) -> Unit)? = null,
+    position: Int = 0
+) {
         if (!product.name.isEmpty()) {
             productName.text = product.name
             productPrice.text = product.price.priceDisplay
@@ -217,12 +248,33 @@ fun CardProductGridBinding.productDataGrid(product: Product, onProductClick: (Pr
                 .load(product.images.firstOrNull())
                 .error(R.drawable.img_1)
                 .into(ivProductImage)
+            showProduct.setOnClickListener {
+                onProductClick(product)
+            }
+            showProduct.setOnClickListener {
+                onProductClick(product)
+            }
 
-            showProduct.setOnClickListener {
-                onProductClick(product)
+            ivMenu.setOnClickListener { view ->
+                val popup = android.widget.PopupMenu(view.context, view)
+                popup.menuInflater.inflate(R.menu.product_menu, popup.menu)
+                popup.setOnMenuItemClickListener { menuItem ->
+                    when (menuItem.itemId) {
+                        R.id.action_edit -> {
+                            onEditClick?.invoke(product, position)
+                            true
+                        }
+                        R.id.action_delete -> {
+                            onDeleteClick?.invoke(product, position)
+                            true
+                        }
+                        else -> false
+                    }
+                }
+
+                popup.show()
             }
-            showProduct.setOnClickListener {
-                onProductClick(product)
-            }
+
         }
+
 }

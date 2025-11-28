@@ -24,6 +24,7 @@ class SearchViewModel: ViewModel() {
         if (flag){
             allProducts = getProducts()
             currentSourceList = getProducts()
+
         }else {
             val json = context.assets.open(JSON_NAME)
                 .bufferedReader()
@@ -78,6 +79,16 @@ class SearchViewModel: ViewModel() {
     fun getProducts(): List<Product>{
         val username=mainRepository.getValueByKey(USERNAME, GUEST)
         return mainRepository.getProducts(username.toString())
+    }
+
+    fun deleteProduct(product: Product) {
+        // Remove from all products list
+        allProducts = allProducts.filter { it.name != product.name }
+        currentSourceList = currentSourceList.filter { it.name != product.name }
+        
+        // Delete from persistent storage
+        val username = mainRepository.getValueByKey(USERNAME, GUEST)
+        mainRepository.deleteProduct(username.toString(), product)
     }
 
 }

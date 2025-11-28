@@ -31,6 +31,8 @@ import com.example.androidlearning.ui.search.SearchActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
 import java.io.File
+import java.text.NumberFormat
+import java.util.Locale
 
 class AddProductActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddProductBinding
@@ -53,7 +55,7 @@ class AddProductActivity : AppCompatActivity() {
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
+        if (result.resultCode == RESULT_OK) {
             capturedImageUri?.let { uri ->
                 selectedImageUrl = uri.toString()
                 displayImage(uri)
@@ -93,12 +95,13 @@ class AddProductActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this)[AddProductViewModel::class.java]
         with(binding) {
             binding.etListPrice.addTextChangedListener {
-                viewModel.getDiscountPrice(it.toString().toInt(), etSalePrice.text.toString().toInt())
+                viewModel.getDiscountPrice(it.toString().toDouble(), etSalePrice.text.toString().toDouble())
             }
             viewModel.discountPercent.observe( this@AddProductActivity) { value ->
-                etDiscountPercent.setText("$value%")
+                etDiscountPercent.setText("${value.toInt()} %")
             }
         }
+
 
 
 
@@ -271,13 +274,13 @@ class AddProductActivity : AppCompatActivity() {
         with(binding) {
             val name = etProductName.text.toString()
             val brand = etBrand.text.toString().ifBlank { "no brand" }
-            val salePrice = etSalePrice.text.toString().toDouble().toInt()
-            val listPrice = etListPrice.text.toString().toDoubleOrNull()?.toInt() ?: salePrice
+            val salePrice = etSalePrice.text.toString().toDouble()
+            val listPrice = etListPrice.text.toString().toDoubleOrNull() ?: salePrice
             val location = etLocation.text.toString().ifBlank { "Unknown" }
             viewModel.getDiscountPrice(listPrice,salePrice)
 
             val discount = if (listPrice > salePrice) {
-                ((listPrice - salePrice).toDouble() / listPrice * 100).toInt()
+                ((listPrice - salePrice) / listPrice * 100).toInt()
             } else {
                 0
             }
@@ -349,9 +352,9 @@ class AddProductActivity : AppCompatActivity() {
         }
     }
 
-    private fun formatPrice(price: Int): String {
-        return price.toString().reversed().chunked(3).joinToString(".").reversed()
-    }
+    private fun formatPrice(price: Double): String {
+        val formatter = NumberFormat.getNumberInstance(Locale("in", "ID"))
+        return formatter.format(price.toInt())    }
 
     private fun saveProduct(product: Product) {
         viewModel.saveProduct(product)

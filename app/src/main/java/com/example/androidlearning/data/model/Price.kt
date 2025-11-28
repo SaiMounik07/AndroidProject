@@ -8,6 +8,6 @@ data class Price(
                  val minPrice: Double,
                  val offerPriceDisplay: String,
                  val isPriceRange: Boolean,
-                 val listPrice: Int,
-                 val salePrice: Int
+                 val listPrice: Double,
+                 val salePrice: Double
 )

@@ -1,5 +1,7 @@
-package com.example.androidlearning.ui.fragments
+package com.example.androidlearning.ui.search.fragment
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.os.Handler
@@ -11,20 +13,21 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidlearning.R
-import com.example.androidlearning.base.constants.Constants.LOAD_DELAY_MS
-import com.example.androidlearning.base.constants.Constants.MIN_SEARCH_LENGTH
-import com.example.androidlearning.base.constants.Constants.SEARCH_DEBOUNCE_MS
+import com.example.androidlearning.base.constants.Constants
+import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.databinding.CardProductBinding
 import com.example.androidlearning.databinding.SearchFragmentBinding
-import com.example.androidlearning.data.model.Product
+import com.example.androidlearning.ui.addproduct.AddProductActivity
 import com.example.androidlearning.ui.search.ProductAdapter
 import com.example.androidlearning.ui.search.SearchViewModel
 import com.example.androidlearning.ui.search.productData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.snackbar.Snackbar
 
 class ProductFragment : Fragment(R.layout.search_fragment) {
     private var displayedProducts: MutableList<Product> = mutableListOf()
@@ -42,10 +45,16 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         binding = SearchFragmentBinding.bind(view)
         searchViewModel = ViewModelProvider(requireActivity())[SearchViewModel::class.java]
 
+
         setupRecyclerView()
         setupSearchListeners()
         setupClickListeners()
         loadInitialData(true)
+        if (displayedProducts.isEmpty() && !isLoading){
+            binding.noProductsInclude.root.visibility = View.VISIBLE
+        }else{
+            binding.noProductsInclude.root.visibility = View.GONE
+        }
     }
 
     private fun setupRecyclerView() {
@@ -53,12 +62,57 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         with(binding.recyclerView) {
             this.layoutManager = this@ProductFragment.layoutManager
             visibility = View.VISIBLE
-            productAdapter = ProductAdapter(displayedProducts, { product ->
-                showProductDetailsBottomSheet(product)
-            }, isGridView = false)
+            productAdapter = ProductAdapter(
+                products = displayedProducts,
+                onProductClick = { product ->
+                    showProductDetailsBottomSheet(product)
+                },
+                isGridView = false,
+                onEditClick = { product, position ->
+                    handleEditProduct(product, position)
+                },
+                onDeleteClick = { product, position ->
+                    handleDeleteProduct(product, position)
+                }
+            )
             adapter = productAdapter
             addOnScrollListener(createScrollListener())
         }
+    }
+
+    private fun handleEditProduct(product: Product, position: Int) {
+        val intent = Intent(requireContext(), AddProductActivity::class.java).apply {
+            putExtra("PRODUCT_ID", product.name)
+            putExtra("EDIT_MODE", true)
+        }
+        startActivity(intent)
+    }
+
+    private fun handleDeleteProduct(product: Product, position: Int) {
+       AlertDialog.Builder(requireContext())
+            .setTitle("Delete Product")
+            .setMessage("Are you sure you want to delete ${product.name}?")
+            .setPositiveButton("Delete") { _, _ ->
+                val removedProduct = displayedProducts[position]
+                displayedProducts.removeAt(position)
+                productAdapter.notifyItemRemoved(position)
+                Snackbar.make(
+                    binding.root,
+                    "Product deleted",
+                    Snackbar.LENGTH_SHORT
+                ).setAction("UNDO") {
+                    displayedProducts.add(position, removedProduct)
+                    productAdapter.notifyItemInserted(position)
+                } .show()
+                Handler(Looper.getMainLooper()).postDelayed({
+                    if (!displayedProducts.contains(removedProduct)) {
+                        searchViewModel.deleteProduct(removedProduct)
+                    }
+                }, 2000)
+            }
+
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupSearchListeners() {
@@ -95,25 +149,26 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             fabAddProduct.setOnClickListener {
                 navigateToAddProduct()
             }
+
         }
     }
-    
+
     private fun navigateToAddProduct() {
-        val intent = android.content.Intent(requireContext(), com.example.androidlearning.ui.addproduct.AddProductActivity::class.java)
+        val intent = Intent(requireContext(), AddProductActivity::class.java)
         startActivity(intent)
     }
 
     private fun toggleViewType() {
-        val isCurrentlyGrid = layoutManager is androidx.recyclerview.widget.GridLayoutManager
-        
+        val isCurrentlyGrid = layoutManager is GridLayoutManager
+
         if (isCurrentlyGrid) {
             layoutManager = LinearLayoutManager(requireContext())
             binding.ivToggleView.setImageResource(R.drawable.linear)
         } else {
-            layoutManager = androidx.recyclerview.widget.GridLayoutManager(requireContext(), 2)
+            layoutManager = GridLayoutManager(requireContext(), 2)
             binding.ivToggleView.setImageResource(R.drawable.gridview)
         }
-        
+
         binding.recyclerView.layoutManager = layoutManager
         productAdapter.toggleViewType(!isCurrentlyGrid)
         binding.recyclerView.addOnScrollListener(createScrollListener())
@@ -121,6 +176,11 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
 
     private fun loadInitialData(flag: Boolean) {
         searchViewModel.loadProductsFromJson(requireContext(),flag)
+        if (displayedProducts.isEmpty()){
+            binding.noProductsInclude.root.visibility = View.VISIBLE
+        }else{
+            binding.noProductsInclude.root.visibility = View.GONE
+        }
         loadMoreProducts()
     }
 
@@ -152,14 +212,14 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
 
         searchRunnable?.let { searchHandler.removeCallbacks(it) }
         searchRunnable = Runnable {
-            if (query.length < MIN_SEARCH_LENGTH && query.isNotEmpty()) {
+            if (query.length < Constants.MIN_SEARCH_LENGTH && query.isNotEmpty()) {
                 handleSearchReset()
             } else {
                 performSearch(query)
             }
         }
-        searchRunnable?.let { 
-            searchHandler.postDelayed(it, SEARCH_DEBOUNCE_MS)
+        searchRunnable?.let {
+            searchHandler.postDelayed(it, Constants.SEARCH_DEBOUNCE_MS)
         }
     }
 
@@ -170,10 +230,10 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     private fun performSearch(query: String) {
         val filteredProducts = searchViewModel.filterProducts(query)
         val shouldShowNoResults = searchViewModel.shouldShowNoResults(filteredProducts, query)
-        
-        binding.noProductsInclude.root.visibility = 
+
+        binding.noProductsInclude.root.visibility =
             if (shouldShowNoResults) View.VISIBLE else View.GONE
-        
+
         searchViewModel.updateSourceList(filteredProducts)
         displayedProducts.clear()
         productAdapter.notifyDataSetChanged()
@@ -196,6 +256,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             productData(product)
             dialog.setContentView(root)
             showProduct.visibility = View.GONE
+            ivMenu.visibility= View.GONE
         }
         val bottomSheet = dialog.behavior
         dialog.setOnShowListener {
@@ -207,7 +268,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
 
     private fun loadMoreProducts() {
         if (isLoading || !searchViewModel.hasMoreItems()) return
-        
+
         isLoading = true
         showLoadingIndicator(true)
 
@@ -219,16 +280,15 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
                 displayedProducts.addAll(newItems)
                 productAdapter.notifyItemRangeInserted(currentSize, newItems.size)
             }
-
             showLoadingIndicator(false)
             isLoading = false
-        }, LOAD_DELAY_MS)
+        }, Constants.LOAD_DELAY_MS)
     }
 
     private fun showLoadingIndicator(show: Boolean) {
         binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
     }
-    
+
     override fun onDestroyView() {
         super.onDestroyView()
         searchRunnable?.let { searchHandler.removeCallbacks(it) }

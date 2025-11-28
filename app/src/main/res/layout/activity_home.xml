@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/home"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <View
+        android:id="@+id/top_bar"
+        android:layout_width="0dp"
+        android:layout_height="110dp"
+        android:background="@color/blibliBlue"
+        app:layout_constraintBottom_toBottomOf="@id/et_search_home"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_login_user"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Hello Guest"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <EditText
         android:id="@+id/et_search_home"
-        android:layout_width="300dp"
-        android:layout_height="@dimen/search_bar_height"
-        android:hint="@string/search_hint"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/search_bar_bg"
-        android:layout_marginHorizontal="@dimen/five_dp"
-        app:layout_constraintStart_toStartOf="parent"
-        android:padding="@dimen/five_dp"
-        android:layout_marginVertical="@dimen/five_dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:textSize="@dimen/search_bar_text_size"
-        android:textColor="@color/black"
-        android:textAlignment="textStart"
         android:clickable="true"
-        />
-
+        android:focusable="false"
+        android:hint="@string/search_hint"
+        android:padding="8dp"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="@id/top_bar"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_login_user" />
 
     <ImageView
         android:id="@+id/iv_search_home"
-        android:layout_width="@dimen/search_icon_size"
-        android:layout_height="@dimen/search_icon_size"
-        android:layout_marginEnd="@dimen/search_icon_margin_end"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="24dp"
         android:background="@drawable/search_icon"
-        android:padding="@dimen/search_icon_padding"
         android:src="@drawable/search_bar_icon"
         app:layout_constraintEnd_toEndOf="@id/et_search_home"
-        app:layout_constraintBottom_toBottomOf="@id/et_search_home"
         app:layout_constraintTop_toTopOf="@id/et_search_home"
-        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="@id/et_search_home" />
+
+    <include
+        layout="@layout/home_content"
+        android:id="@+id/home_content"
         />
-    <TextView
-        android:layout_width="wrap_content"
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Hi"
-        app:layout_constraintTop_toTopOf="parent"
+        android:background="@android:color/white"
+        app:itemIconTint="@color/bottom_nav_color"
+        app:itemTextColor="@color/bottom_nav_color"
+        app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:id="@+id/tv_login_user"
-        />
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/search_page"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/tv_login_user"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:text="search page"
-        android:backgroundTint="@color/blibliBlue"
-        app:cornerRadius="@dimen/layout_spacing"
-        />
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/mb_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/search_page"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        android:text="Logout"
-        android:backgroundTint="@color/blibliBlue"
-        app:cornerRadius="@dimen/layout_spacing"
-        />
-
-
-
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:menu="@menu/bottom_nav_menu" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

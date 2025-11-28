@@ -11,4 +11,11 @@ data class Product(
     val soldCountTotal: Int,
     val uspLabelsTags: List<String>,
     val images: List<String>
-)
+) {
+    // Generate unique ID based on product name
+    val id: String
+        get() = name.lowercase()
+            .replace(Regex("[^a-z0-9]"), "-")
+            .replace(Regex("-+"), "-")
+            .trim('-')
+}

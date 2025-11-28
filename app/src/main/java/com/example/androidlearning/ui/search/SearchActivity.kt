@@ -10,7 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.enableEdgeToEdge
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.androidlearning.ui.fragments.ProductFragment
+import com.example.androidlearning.ui.search.fragment.ProductFragment
 
 class SearchActivity : AppCompatActivity() {
 

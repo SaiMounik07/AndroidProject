@@ -9,8 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
-
-        <!-- Header -->
         <TextView
             android:id="@+id/tv_header"
             android:layout_width="0dp"
@@ -109,11 +107,8 @@
                 android:id="@+id/et_product_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords"
                 android:maxLines="3" />
         </com.google.android.material.textfield.TextInputLayout>
-
-        <!-- Brand -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/til_brand"
             android:layout_width="0dp"
@@ -128,7 +123,7 @@
                 android:id="@+id/et_brand"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords" />
+                 />
         </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Price Section -->
@@ -214,10 +209,9 @@
                 android:id="@+id/et_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="textCapWords" />
+                android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Store Badges Section -->
         <TextView
             android:id="@+id/tv_store_section"
             android:layout_width="wrap_content"
