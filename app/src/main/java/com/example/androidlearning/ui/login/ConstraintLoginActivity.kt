@@ -7,12 +7,14 @@ import android.widget.Toast
 
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.example.androidlearning.R
 import com.example.androidlearning.base.constants.Constants.ENTER_USERNAME
 import com.example.androidlearning.ui.home.HomeActivity
 import com.example.androidlearning.ui.search.SearchActivity
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 
 class ConstraintLoginActivity : AppCompatActivity() {
     lateinit var constraintViewModel: ConstraintViewModel
@@ -23,10 +25,10 @@ class ConstraintLoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_constraint)
+        val layout=findViewById<ConstraintLayout>(R.id.login_page)
         constraintViewModel = ViewModelProvider(this)[ConstraintViewModel::class.java]
         constraintViewModel.saveValues("username", "sai")
         constraintViewModel.saveValues("password", "sai")
-        Toast.makeText(this, "Constraint Layout", Toast.LENGTH_SHORT).show()
         val username = findViewById<EditText>(R.id.userfield)
         val password = findViewById<EditText>(R.id.password_field)
         val loginButton = findViewById<MaterialButton>(R.id.loginbutton)
@@ -44,6 +46,7 @@ class ConstraintLoginActivity : AppCompatActivity() {
                     name = username.text.toString(),
                     password = password.text.toString(),
                     onSuccess = {
+                        Snackbar.make(layout,"login success",Snackbar.LENGTH_INDEFINITE).show()
                         startActivity(Intent(this, HomeActivity::class.java))
                     },
                     onFailure = {

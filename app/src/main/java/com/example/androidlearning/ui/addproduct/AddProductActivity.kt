@@ -7,6 +7,8 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -26,6 +28,8 @@ import com.example.androidlearning.data.model.Price
 import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.data.model.Review
 import com.example.androidlearning.ui.search.SearchActivity
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.delay
 import java.io.File
 
 class AddProductActivity : AppCompatActivity() {
@@ -99,6 +103,7 @@ class AddProductActivity : AppCompatActivity() {
 
 
         setupClickListeners()
+
     }
 
     private fun setupClickListeners() {
@@ -350,11 +355,10 @@ class AddProductActivity : AppCompatActivity() {
 
     private fun saveProduct(product: Product) {
         viewModel.saveProduct(product)
-        Toast.makeText(
-            this,
-            "Product saved: ${product.name}",
-            Toast.LENGTH_LONG
-        ).show()
-        startActivity(Intent(this, SearchActivity::class.java))
-    }
+        Snackbar.make(binding.root,"Product saved: ${product.name}",Snackbar.LENGTH_LONG).setAction("UNDO"){
+            viewModel.deleteProduct(product)
+        }.show()
+        Handler(Looper.getMainLooper()).postDelayed({
+            startActivity(Intent(this, SearchActivity::class.java))
+        }, 1000)    }
 }

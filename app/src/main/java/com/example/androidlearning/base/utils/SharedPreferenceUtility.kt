@@ -43,4 +43,11 @@ class SharedPreferenceUtility(name:String) {
         val type=object :TypeToken<List<Product>>(){}.type
         return gson.fromJson(json,type)?: emptyList()
     }
+    fun deleteProduct(key:String,product:Product){
+        val productList=getProducts(key).toMutableList()
+        productList.remove(product)
+        val gson=Gson()
+        val json=gson.toJson(productList)
+        edit.putString(key,json).apply()
+    }
 }

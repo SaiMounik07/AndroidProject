@@ -12,10 +12,6 @@ class AddProductViewModel : ViewModel() {
 
     val mainRepository: MainRepository= MainRepository()
 
-    
-    private val _validationError = MutableLiveData<String>()
-    val validationError: LiveData<String> = _validationError
-
     private val _discountPercent= MutableLiveData<Int>()
     val discountPercent: LiveData<Int> = _discountPercent
 
@@ -26,36 +22,12 @@ class AddProductViewModel : ViewModel() {
             0
         }
     }
-
     fun saveProduct(product: Product){
         val username=mainRepository.getValueByKey(USERNAME, GUEST)
         mainRepository.saveProduct(username.toString(),product)
     }
-    fun getProducts(): List<Product>{
+    fun deleteProduct(product:Product){
         val username=mainRepository.getValueByKey(USERNAME, GUEST)
-        return mainRepository.getProducts(username.toString())
+        mainRepository.deleteProduct(username.toString(),product)
     }
-    
-    fun validateProduct(
-        name: String,
-        salePrice: String,
-        imageUrl: String?
-    ): Boolean {
-        return when {
-            name.isBlank() -> {
-                _validationError.value = "Product name is required"
-                false
-            }
-            salePrice.isBlank() -> {
-                _validationError.value = "Sale price is required"
-                false
-            }
-            imageUrl.isNullOrBlank() -> {
-                _validationError.value = "Product image is required"
-                false
-            }
-            else -> true
-        }
-    }
-
 }

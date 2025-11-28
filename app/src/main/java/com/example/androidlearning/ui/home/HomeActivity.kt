@@ -16,6 +16,7 @@ import com.example.androidlearning.databinding.ActivityHomeBinding
 import com.example.androidlearning.ui.learnings.LearningActivity
 import com.example.androidlearning.ui.search.SearchActivity
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.snackbar.Snackbar
 
 class HomeActivity:AppCompatActivity() {
     lateinit var homeViewModel: HomeViewModel
@@ -48,7 +49,7 @@ class HomeActivity:AppCompatActivity() {
             binding.searchPage.setOnClickListener {
                 startActivity(Intent(this, SearchActivity::class.java))
             }
-            Toast.makeText(this, "HI $username", Toast.LENGTH_SHORT).show()
+        Snackbar.make(binding.root,"Hi $username",Snackbar.LENGTH_LONG).show()
         }
 
 }

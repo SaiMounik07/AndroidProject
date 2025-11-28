@@ -23,6 +23,9 @@ class MainRepository {
     fun getProducts(key:String):List<Product> {
         return sharedPreferences.getProducts(key)
     }
+    fun deleteProduct(key:String,product: Product){
+        sharedPreferences.deleteProduct(key,product)
+    }
 
 
 
