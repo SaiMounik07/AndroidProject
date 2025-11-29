@@ -20,6 +20,7 @@ class SearchViewModel: ViewModel() {
     private var currentSourceList: List<Product> = emptyList()
     private var loadedCount: Int = 0
     val mainRepository: MainRepository= MainRepository()
+    val LOAD_DATA_FROM_REPO: Boolean=true
     fun loadProductsFromJson(context: Context,flag:Boolean) {
         if (flag){
             allProducts = getProducts()

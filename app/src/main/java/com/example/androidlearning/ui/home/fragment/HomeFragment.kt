@@ -1,27 +1,18 @@
 package com.example.androidlearning.ui.home.fragment
 
 
-import android.R.id.home
-import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.androidlearning.R
 import com.example.androidlearning.base.constants.Constants.GUEST
 import com.example.androidlearning.base.constants.Constants.USERNAME
-import com.example.androidlearning.databinding.ActivityHomeBinding
 import com.example.androidlearning.databinding.QuickActionBinding
-import com.example.androidlearning.ui.addproduct.AddProductActivity
 import com.example.androidlearning.ui.addproduct.fragment.AddProductFragment
 import com.example.androidlearning.ui.home.HomeViewModel
-import com.example.androidlearning.ui.login.ConstraintLoginActivity
-import com.example.androidlearning.ui.search.SearchActivity
 import com.example.androidlearning.ui.search.fragment.ProductFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 
 class HomeFragment: Fragment(R.layout.quick_action) {
@@ -41,22 +32,43 @@ class HomeFragment: Fragment(R.layout.quick_action) {
                         .replace(R.id.home_page, ProductFragment())
                         .addToBackStack(null)
                         .commit()
+                    requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                        .selectedItemId=R.id.nav_search
                 }
 
                 homeContent.cardSearch.setOnClickListener {
                     parentFragmentManager.beginTransaction()
                         .replace(R.id.home_page, ProductFragment())
                         .addToBackStack(null)
-                        .commit()                }
+                        .commit()
+                    requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                        .selectedItemId=R.id.nav_search
+
+                }
 
                 homeContent.cardAddProduct.setOnClickListener {
                     parentFragmentManager.beginTransaction()
                         .replace(R.id.home_page, AddProductFragment())
                         .addToBackStack(null)
-                        .commit()                }
-//                Snackbar.make(root, "Hi $username", Snackbar.LENGTH_LONG).show()
+                        .commit()
+                    requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+                        .selectedItemId=R.id.nav_add_product
+                }
+                Snackbar.make(root, "Hi $username", Snackbar.LENGTH_LONG).show()
             }
         }
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
 }

@@ -26,6 +26,7 @@ import com.example.androidlearning.ui.addproduct.fragment.AddProductFragment
 import com.example.androidlearning.ui.search.ProductAdapter
 import com.example.androidlearning.ui.search.SearchViewModel
 import com.example.androidlearning.ui.search.productData
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -50,7 +51,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         setupRecyclerView()
         setupSearchListeners()
         setupClickListeners()
-        loadInitialData(true)
+        loadInitialData(searchViewModel.LOAD_DATA_FROM_REPO)
         if (displayedProducts.isEmpty() && !isLoading){
             binding.noProductsInclude.root.visibility = View.VISIBLE
         }else{
@@ -103,6 +104,8 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             .replace(R.id.home_page, fragment)
             .addToBackStack(null)
             .commit()
+//        requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+//            .selectedItemId=R.id.nav_add_product
     }
 
     private fun handleDeleteProduct(product: Product, position: Int) {
@@ -152,7 +155,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
                 recyclerView.smoothScrollToPosition(0)
             }
             ivBack.setOnClickListener {
-                findNavController().navigateUp()
+                parentFragmentManager.popBackStack()
             }
             ivClearText.setOnClickListener {
                 resetSearch()
@@ -321,7 +324,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         binding.etSearch.setText("")
         binding.ivClearText.visibility = View.GONE
         
-        searchViewModel.loadProductsFromJson(requireContext(), true)
+        searchViewModel.loadProductsFromJson(requireContext(), searchViewModel.LOAD_DATA_FROM_REPO)
         searchViewModel.resetToAllProducts()
         
         loadMoreProducts()

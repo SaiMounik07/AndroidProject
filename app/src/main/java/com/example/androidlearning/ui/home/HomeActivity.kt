@@ -50,6 +50,9 @@ class HomeActivity:AppCompatActivity() {
                    .commit()
 
                bottomNavigation.setOnItemSelectedListener { item ->
+                   if (bottomNavigation.selectedItemId == item.itemId) {
+                       return@setOnItemSelectedListener true
+                   }
                    when (item.itemId) {
                        R.id.nav_home -> {
                            supportFragmentManager.beginTransaction()
@@ -59,6 +62,7 @@ class HomeActivity:AppCompatActivity() {
                        }
 
                        R.id.nav_search -> {
+
                            supportFragmentManager.beginTransaction()
                                .replace(R.id.home_page, ProductFragment())
                                .commit()

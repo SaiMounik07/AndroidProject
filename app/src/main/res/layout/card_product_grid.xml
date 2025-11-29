@@ -235,17 +235,16 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/flow_store"
         app:layout_constraintBottom_toBottomOf="parent" />
-    <ImageView
+    <TextView
         android:id="@+id/iv_menu"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="8dp"
-        android:src="@android:drawable/ic_menu_more"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginEnd="@dimen/five_dp"
+        android:text="@string/vertical_ellipsis"
         android:contentDescription="More options"
-        android:background="?attr/selectableItemBackgroundBorderless"
         android:padding="4dp"
-        app:layout_constraintTop_toBottomOf="@id/flow_store"
+        android:clickable="true"
+        app:layout_constraintTop_toBottomOf="@id/flow_labels"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

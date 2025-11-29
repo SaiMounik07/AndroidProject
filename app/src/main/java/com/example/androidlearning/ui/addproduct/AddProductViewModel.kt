@@ -30,4 +30,8 @@ class AddProductViewModel : ViewModel() {
         val username=mainRepository.getValueByKey(USERNAME, GUEST)
         mainRepository.deleteProduct(username.toString(),product)
     }
+    fun getProducts(): List<Product>{
+        val username=mainRepository.getValueByKey(USERNAME, GUEST)
+        return mainRepository.getProducts(username.toString())
+    }
 }

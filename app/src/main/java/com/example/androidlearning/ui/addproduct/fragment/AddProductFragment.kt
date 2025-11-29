@@ -29,6 +29,7 @@ import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.data.model.Review
 import com.example.androidlearning.databinding.ActivityAddProductBinding
 import com.example.androidlearning.ui.addproduct.AddProductViewModel
+import com.example.androidlearning.ui.home.fragment.HomeFragment
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.text.NumberFormat
@@ -40,6 +41,7 @@ class AddProductFragment : Fragment() {
     private lateinit var viewModel: AddProductViewModel
     private var selectedImageUrl: String? = null
     private var capturedImageUri: Uri? = null
+    private var editMode: Boolean=false
 
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -120,6 +122,7 @@ class AddProductFragment : Fragment() {
                 preFillProductData(args)
                 binding.tvHeader.text = "Edit Product"
                 binding.btnSave.text = "Update Product"
+                editMode=true
             }
         }
 
@@ -273,10 +276,16 @@ class AddProductFragment : Fragment() {
         var isValid = true
 
         with(binding) {
-            if (etProductName.text.isNullOrBlank()) {
+
+            if (etProductName.text.isNullOrBlank() ) {
                 tilProductName.error = "Product name is required"
                 isValid = false
-            } else {
+            }
+            else if(viewModel.getProducts().find { it.name.equals(etProductName.text.toString(), ignoreCase = true) }!=null && !editMode){
+                tilProductName.error = "Product name already exists"
+                isValid = false
+            }
+            else{
                 tilProductName.error = null
             }
             if (etSalePrice.text.isNullOrBlank()) {
@@ -428,7 +437,9 @@ class AddProductFragment : Fragment() {
         }.show()
 
         Handler(Looper.getMainLooper()).postDelayed({
-            parentFragmentManager.popBackStack()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.home_page, HomeFragment())
+                .commit()
         }, 1000)
     }
 
