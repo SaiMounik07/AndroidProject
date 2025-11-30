@@ -59,16 +59,4 @@ class HomeFragment: Fragment(R.layout.quick_action) {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
 }

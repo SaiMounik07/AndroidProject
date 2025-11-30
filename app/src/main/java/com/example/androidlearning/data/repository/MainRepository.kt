@@ -26,6 +26,9 @@ class MainRepository {
     fun deleteProduct(key:String,product: Product){
         sharedPreferences.deleteProduct(key,product)
     }
+    fun clearSpecificData(key:String){
+        sharedPreferences.clearSpecificData(key)
+    }
 
 
 

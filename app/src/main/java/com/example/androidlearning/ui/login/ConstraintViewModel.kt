@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.example.androidlearning.base.constants.Constants.PASSWORD
 import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.data.repository.MainRepository
+import org.json.JSONArray
+import org.json.JSONObject
 
 class ConstraintViewModel : ViewModel() {
     val mainRepository = MainRepository()
@@ -24,14 +26,46 @@ class ConstraintViewModel : ViewModel() {
         onSuccess: () -> Unit,
         onFailure: () -> Unit
     ) {
-        val username: String = mainRepository.getValueByKey(USERNAME, name).toString()
-        val passwordFromRepository: String = mainRepository.getValueByKey(PASSWORD, password).toString()
-        if (!name.isEmpty() && name == username && !password.isEmpty() && password == passwordFromRepository) {
-            onSuccess.invoke()
+        if (name.isEmpty() || password.isEmpty()) {
+            onFailure.invoke()
+            return
+        }
+        
+        val usersJson = mainRepository.getValueByKey("USERS", "[]")
+        val usersArray = JSONArray(usersJson)
+        
+        var isValid = false
 
+        for (i in 0 until usersArray.length()) {
+            val user = usersArray.getJSONObject(i)
+            val storedUsername = user.getString("username")
+            val storedPassword = user.getString("password")
+            
+            if (name == storedUsername && password == storedPassword) {
+                isValid = true
+                mainRepository.saveValueByKey(USERNAME, name)
+                break
+            }
+        }
+        
+        if (isValid) {
+            onSuccess.invoke()
         } else {
             onFailure.invoke()
         }
+    }
+    fun addUser(username: String, password: String) {
+        val existing = mainRepository.getValueByKey("USERS", "[]")
+        val arr = JSONArray(existing)
+
+        val user = JSONObject().apply {
+            put("username", username)
+            put("password", password)
+        }
+
+        arr.put(user)
+
+        mainRepository.saveValueByKey("USERS", arr.toString())
     }
 
 }

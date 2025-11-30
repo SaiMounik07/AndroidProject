@@ -14,6 +14,8 @@ class HomeViewModel: ViewModel() {
     fun clearData(){
         mainRepository.clearData()
     }
-
+    fun logout() {
+        mainRepository.clearSpecificData("CURRENT_USER")
+    }
 
 }

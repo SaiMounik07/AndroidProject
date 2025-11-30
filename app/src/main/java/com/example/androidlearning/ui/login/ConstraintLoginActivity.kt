@@ -27,8 +27,10 @@ class ConstraintLoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_constraint)
         val layout=findViewById<ConstraintLayout>(R.id.login_page)
         constraintViewModel = ViewModelProvider(this)[ConstraintViewModel::class.java]
-        constraintViewModel.saveValues("username", "sai")
-        constraintViewModel.saveValues("password", "sai")
+        constraintViewModel.addUser("sai","sai")
+        constraintViewModel.addUser("user","user")
+//        constraintViewModel.saveValues("username", "sai")
+//        constraintViewModel.saveValues("password", "sai")
         val username = findViewById<EditText>(R.id.userfield)
         val password = findViewById<EditText>(R.id.password_field)
         val loginButton = findViewById<MaterialButton>(R.id.loginbutton)

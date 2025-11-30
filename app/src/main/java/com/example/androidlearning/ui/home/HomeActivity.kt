@@ -28,10 +28,12 @@ import com.google.android.material.snackbar.Snackbar
 
 class HomeActivity:AppCompatActivity() {
     var binding: ActivityHomeBinding?=null
+    lateinit var homeViewModel: HomeViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityHomeBinding.inflate(layoutInflater)
+        homeViewModel=ViewModelProvider(this)[HomeViewModel::class.java]
         binding?.let {
            with(it) {
                setContentView(root)
@@ -95,9 +97,11 @@ class HomeActivity:AppCompatActivity() {
                                .setNegativeButton("Cancel", null)
                                .show()
                                 }
+
                                }
+                     homeViewModel.logout()
                            true
-                       }
+               }
 
            }
                }
