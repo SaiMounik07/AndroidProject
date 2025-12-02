@@ -13,8 +13,10 @@ recyclerview = "1.4.0"
 glide="4.16.0"
 gson="2.10.1"
 navigationFragment = "2.9.6"
+hilt="2.48"
 
 [libraries]
+hilt={module="com.google.dagger:hilt-android",version.ref="hilt"}
 gson={module="com.google.code.gson:gson",version.ref="gson"}
 glide={module="com.github.bumptech.glide:glide",version.ref="glide"}
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }

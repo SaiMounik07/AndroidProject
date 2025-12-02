@@ -19,6 +19,8 @@ class ProductAdapter(
     private val onEditClick: ((Product, Int) -> Unit)? = null,
     private val onDeleteClick: ((Product, Int) -> Unit)? = null
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+     var flag = false
+    var lastProduct=false
     
     companion object {
         const val VIEW_TYPE_LIST = 0
@@ -46,12 +48,28 @@ class ProductAdapter(
             ListViewHolder(binding)
         }
     }
-    
+    fun showLoadingIndicator(flag:Boolean){
+       this.flag=flag
+    }
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val product = products[position]
         when (holder) {
-            is ListViewHolder -> holder.binding.productData(product, onProductClick, onEditClick, onDeleteClick, position)
-            is GridViewHolder -> holder.binding.productDataGrid(product, onProductClick, onEditClick, onDeleteClick, position)
+            is ListViewHolder -> holder.binding.productData(
+                product,
+                onProductClick,
+                onEditClick,
+                onDeleteClick,
+                holder,
+                lastElement = (flag && position==(products.size-1)&&!lastProduct)
+            )
+            is GridViewHolder -> holder.binding.productDataGrid(
+                product,
+                onProductClick,
+                onEditClick,
+                onDeleteClick,
+                holder
+            )
+
         }
     }
 
@@ -70,11 +88,12 @@ class ProductAdapter(
 }
 
 fun CardProductBinding.productData(
-    product: Product, 
+    product: Product,
     onProductClick: (Product) -> Unit = {},
     onEditClick: ((Product, Int) -> Unit)? = null,
     onDeleteClick: ((Product, Int) -> Unit)? = null,
-    position: Int = 0
+    holder: RecyclerView.ViewHolder?=null,
+    lastElement: Boolean=false
 ) {
 
     if (!product.name.isEmpty()) {
@@ -133,7 +152,6 @@ fun CardProductBinding.productData(
 
         }
 
-
         tvSoldNumbers.text = product.soldCountTotal.toString()
         tvSoldText.text = "Terjual"
         tvStoreName.text = product.location
@@ -152,33 +170,53 @@ fun CardProductBinding.productData(
         showProduct.setOnClickListener {
             onProductClick(product)
         }
+
         ivMenu.setOnClickListener { view ->
             val popup = android.widget.PopupMenu(view.context, view)
             popup.menuInflater.inflate(R.menu.product_menu, popup.menu)
             popup.setOnMenuItemClickListener { menuItem ->
-                when (menuItem.itemId) {
-                    R.id.action_edit -> {
-                        onEditClick?.invoke(product, position)
-                        true
+                val currentPosition = holder?.bindingAdapterPosition
+                if (currentPosition != RecyclerView.NO_POSITION) {
+                    when (menuItem.itemId) {
+                        R.id.action_edit -> {
+                            onEditClick?.invoke(product, currentPosition?.toInt() ?: 0)
+                            true
+                        }
+                        R.id.action_delete -> {
+                            onDeleteClick?.invoke(product, currentPosition?.toInt() ?: 0)
+                            true
+                        }
+                        else -> false
                     }
-                    R.id.action_delete -> {
-                        onDeleteClick?.invoke(product, position)
-                        true
-                    }
-                    else -> false
+                } else {
+                    false
                 }
             }
             popup.show()
         }
+        if(lastElement)
+            progressBar.visibility= View.VISIBLE
+        else{
+
+            progressBar.visibility= View.GONE
+        }
+
+
+
     }
 }
+
+
 fun CardProductGridBinding.productDataGrid(
     product: Product, 
     onProductClick: (Product) -> Unit = {},
     onEditClick: ((Product, Int) -> Unit)? = null,
     onDeleteClick: ((Product, Int) -> Unit)? = null,
-    position: Int = 0
+    holder: RecyclerView.ViewHolder
 ) {
+        // Hide progress bar in grid view - use fragment's main progress bar instead
+        progressBar.visibility = View.GONE
+        
         if (!product.name.isEmpty()) {
             productName.text = product.name
             productPrice.text = product.price.priceDisplay
@@ -259,16 +297,21 @@ fun CardProductGridBinding.productDataGrid(
                 val popup = android.widget.PopupMenu(view.context, view)
                 popup.menuInflater.inflate(R.menu.product_menu, popup.menu)
                 popup.setOnMenuItemClickListener { menuItem ->
-                    when (menuItem.itemId) {
-                        R.id.action_edit -> {
-                            onEditClick?.invoke(product, position)
-                            true
+                    val currentPosition = holder.bindingAdapterPosition
+                    if (currentPosition != RecyclerView.NO_POSITION) {
+                        when (menuItem.itemId) {
+                            R.id.action_edit -> {
+                                onEditClick?.invoke(product, currentPosition)
+                                true
+                            }
+                            R.id.action_delete -> {
+                                onDeleteClick?.invoke(product, currentPosition)
+                                true
+                            }
+                            else -> false
                         }
-                        R.id.action_delete -> {
-                            onDeleteClick?.invoke(product, position)
-                            true
-                        }
-                        else -> false
+                    } else {
+                        false
                     }
                 }
 

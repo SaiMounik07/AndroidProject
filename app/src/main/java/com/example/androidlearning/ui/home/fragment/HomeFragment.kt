@@ -10,10 +10,9 @@ import com.example.androidlearning.base.constants.Constants.GUEST
 import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.databinding.QuickActionBinding
 import com.example.androidlearning.ui.addproduct.fragment.AddProductFragment
+import com.example.androidlearning.ui.home.HomeActivity
 import com.example.androidlearning.ui.home.HomeViewModel
 import com.example.androidlearning.ui.search.fragment.ProductFragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.snackbar.Snackbar
 
 class HomeFragment: Fragment(R.layout.quick_action) {
     lateinit var homeViewModel: HomeViewModel
@@ -28,33 +27,20 @@ class HomeFragment: Fragment(R.layout.quick_action) {
                 val username = homeViewModel.getValueByKey(USERNAME, GUEST)
                 tvLoginUser.text = "Hello $username"
                 etSearchHome.setOnClickListener {
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.home_page, ProductFragment())
-                        .addToBackStack(null)
-                        .commit()
-                    requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-                        .selectedItemId=R.id.nav_search
+                    (activity as HomeActivity).replaceFragment(ProductFragment(),selectBottomId=R.id.nav_search)
+//                    requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
+//                        .selectedItemId=R.id.nav_search
                 }
 
                 homeContent.cardSearch.setOnClickListener {
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.home_page, ProductFragment())
-                        .addToBackStack(null)
-                        .commit()
-                    requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-                        .selectedItemId=R.id.nav_search
+                    (activity as HomeActivity).replaceFragment(ProductFragment(),selectBottomId=R.id.nav_search)
 
                 }
-
                 homeContent.cardAddProduct.setOnClickListener {
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.home_page, AddProductFragment())
-                        .addToBackStack(null)
-                        .commit()
-                    requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-                        .selectedItemId=R.id.nav_add_product
+                    (activity as HomeActivity).replaceFragment(AddProductFragment(),selectBottomId=R.id.nav_add_product)
+
                 }
-                Snackbar.make(root, "Hi $username", Snackbar.LENGTH_LONG).show()
+
             }
         }
     }

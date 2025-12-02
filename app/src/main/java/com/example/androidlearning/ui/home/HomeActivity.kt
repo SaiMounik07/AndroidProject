@@ -7,11 +7,14 @@ import android.os.Looper
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import com.example.androidlearning.R
 import com.example.androidlearning.base.constants.Constants.GUEST
@@ -74,7 +77,6 @@ class HomeActivity:AppCompatActivity() {
                        R.id.nav_add_product -> {
                            supportFragmentManager.beginTransaction()
                                .replace(R.id.home_page, AddProductFragment())
-                               .addToBackStack(null)
                                .commit()
                            true
                        }
@@ -102,16 +104,23 @@ class HomeActivity:AppCompatActivity() {
                      homeViewModel.logout()
                            true
                }
+               val username = homeViewModel.getValueByKey(USERNAME, GUEST)
+               Snackbar.make(root, "Hi $username", Snackbar.LENGTH_LONG).show()
 
            }
-               }
+
+        }
+
 
 
            }
+    fun replaceFragment(fragment: Fragment, addToBackStack: Boolean = true, selectBottomId: Int? = null) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.home_page, fragment)
+            .commit()
+//        selectBottomId?.let {
+//            binding?.bottomNavigation?.selectedItemId = it
+        }
 
 
-    override fun onResume() {
-        super.onResume()
-        binding?.bottomNavigation?.menu?.findItem(R.id.nav_home)?.isChecked = true
-    }
 }

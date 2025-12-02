@@ -225,21 +225,22 @@
         app:flow_wrapMode="none"
         app:layout_constraintStart_toEndOf="@id/iv_product_image"
         app:layout_constraintTop_toBottomOf="@id/flow_rating" />
+
     <com.google.android.material.button.MaterialButton
+        android:id="@+id/show_product"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:id="@+id/show_product"
-        app:layout_constraintTop_toBottomOf="@id/flow_store"
-        app:layout_constraintStart_toEndOf="@id/iv_product_image"
-        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginStart="4dp"
+        android:backgroundTint="@color/blibliBlue"
         android:text="Lihat Produk"
         android:textColor="@color/white"
-        android:backgroundTint="@color/blibliBlue"
         app:cornerRadius="10dp"
-        android:layout_marginStart="6dp"
-        android:layout_marginEnd="@dimen/five_dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintBottom_toTopOf="@id/progressBar"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_product_image"
+        app:layout_constraintTop_toBottomOf="@id/flow_store"
+         />
+
     <TextView
         android:id="@+id/iv_menu"
         android:layout_width="32dp"
@@ -251,5 +252,15 @@
         android:clickable="true"
         app:layout_constraintTop_toBottomOf="@id/flow_labels"
         app:layout_constraintEnd_toEndOf="parent"
+        />
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@id/show_product"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="@dimen/progressbar_margin_bottom"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -41,6 +41,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.hilt)
     implementation(libs.gson)
     implementation(libs.glide)
     implementation(libs.androidx.recyclerview)

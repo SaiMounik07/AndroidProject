@@ -115,8 +115,6 @@ class AddProductFragment : Fragment() {
                 etDiscountPercent.setText("${value.toInt()} %")
             }
         }
-
-        // Check if in edit mode and pre-fill data
         arguments?.let { args ->
             if (args.getBoolean("EDIT_MODE", false)) {
                 preFillProductData(args)

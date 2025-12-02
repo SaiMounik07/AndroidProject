@@ -20,7 +20,7 @@ class SearchViewModel: ViewModel() {
     private var currentSourceList: List<Product> = emptyList()
     private var loadedCount: Int = 0
     val mainRepository: MainRepository= MainRepository()
-    val LOAD_DATA_FROM_REPO: Boolean=false
+    val LOAD_DATA_FROM_REPO: Boolean=true
     fun loadProductsFromJson(context: Context,flag:Boolean) {
         if (flag){
             allProducts = getProducts()
@@ -37,6 +37,7 @@ class SearchViewModel: ViewModel() {
             currentSourceList = products
         }
     }
+
     
     fun filterProducts(query: String): List<Product> {
         return if (query.length < MIN_SEARCH_LENGTH) {
@@ -83,11 +84,8 @@ class SearchViewModel: ViewModel() {
     }
 
     fun deleteProduct(product: Product) {
-        // Remove from all products list
         allProducts = allProducts.filter { it.name != product.name }
         currentSourceList = currentSourceList.filter { it.name != product.name }
-        
-        // Delete from persistent storage
         val username = mainRepository.getValueByKey(USERNAME, GUEST)
         mainRepository.deleteProduct(username.toString(), product)
     }

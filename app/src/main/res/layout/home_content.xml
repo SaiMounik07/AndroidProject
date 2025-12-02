@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="0dp"
     android:layout_height="0dp"
-    android:padding="16dp"
+    android:padding="@dimen/margin_large"
     app:layout_constraintTop_toBottomOf="@id/top_bar"
     app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
     app:layout_constraintStart_toStartOf="parent"
@@ -15,9 +15,9 @@
         android:id="@+id/tv_quick_actions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Quick Actions"
-        android:textSize="18sp"
+        android:layout_marginTop="@dimen/margin_large"
+        android:text="@string/quick_actions"
+        android:textSize="@dimen/font_size_subtitle"
         android:textStyle="bold"
         android:textColor="@color/black"
         app:layout_constraintTop_toBottomOf="@id/top_bar"
@@ -25,11 +25,11 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_search"
         android:layout_width="0dp"
-        android:layout_height="120dp"
+        android:layout_height="@dimen/product_card_height"
         android:layout_marginTop="12dp"
-        android:layout_marginEnd="8dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="2dp"
+        android:layout_marginEnd="@dimen/margin_medium"
+        app:cardCornerRadius="@dimen/card_corner_radius_large"
+        app:cardElevation="@dimen/card_elevation"
         app:layout_constraintTop_toBottomOf="@id/tv_quick_actions"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/card_add_product">
@@ -39,29 +39,30 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="16dp">
+            android:padding="@dimen/margin_large">
 
             <ImageView
                 android:id="@+id/iv_search_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
                 android:src="@drawable/search_bar_icon"
-                android:tint="@color/blibliBlue" />
+                android:contentDescription="@string/search"
+                app:tint="@color/blibliBlue" />
 
             <TextView
                 android:id="@+id/tv_search_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Search"
-                android:textSize="14sp"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:text="@string/search"
+                android:textSize="@dimen/font_size_body"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_search_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Find products"
+                android:text="@string/find_products"
                 android:textSize="11sp"
                 android:textColor="@color/greyName" />
 
@@ -71,10 +72,10 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/card_add_product"
         android:layout_width="0dp"
-        android:layout_height="120dp"
-        android:layout_marginStart="8dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="2dp"
+        android:layout_height="@dimen/product_card_height"
+        android:layout_marginStart="@dimen/margin_medium"
+        app:cardCornerRadius="@dimen/card_corner_radius_large"
+        app:cardElevation="@dimen/card_elevation"
         app:layout_constraintTop_toTopOf="@id/card_search"
         app:layout_constraintStart_toEndOf="@id/card_search"
         app:layout_constraintEnd_toEndOf="parent">
@@ -84,29 +85,30 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:gravity="center"
-            android:padding="16dp">
+            android:padding="@dimen/margin_large">
 
             <ImageView
                 android:id="@+id/iv_add_icon"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="@dimen/icon_size_large"
+                android:layout_height="@dimen/icon_size_large"
                 android:src="@android:drawable/ic_input_add"
-                android:tint="@color/blibliBlue" />
+                android:contentDescription="@string/add_product"
+                app:tint="@color/blibliBlue" />
 
             <TextView
                 android:id="@+id/tv_add_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="Add Product"
-                android:textSize="14sp"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:text="@string/add_product"
+                android:textSize="@dimen/font_size_body"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_add_subtitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Create new"
+                android:text="@string/create_new"
                 android:textSize="11sp"
                 android:textColor="@color/greyName" />
 

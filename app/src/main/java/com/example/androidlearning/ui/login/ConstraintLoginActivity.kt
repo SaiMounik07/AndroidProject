@@ -12,7 +12,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.androidlearning.R
 import com.example.androidlearning.base.constants.Constants.ENTER_USERNAME
 import com.example.androidlearning.ui.home.HomeActivity
-import com.example.androidlearning.ui.search.SearchActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 
@@ -50,10 +49,12 @@ class ConstraintLoginActivity : AppCompatActivity() {
                     onSuccess = {
                         Snackbar.make(layout,"login success",Snackbar.LENGTH_INDEFINITE).show()
                         startActivity(Intent(this, HomeActivity::class.java))
+
                     },
                     onFailure = {
                         Toast.makeText(this, ENTER_USERNAME, Toast.LENGTH_SHORT).show()
                     })
+
             }
         }
     }

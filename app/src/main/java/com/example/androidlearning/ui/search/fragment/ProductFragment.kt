@@ -1,7 +1,6 @@
 package com.example.androidlearning.ui.search.fragment
 
 import android.app.AlertDialog
-import android.content.Intent
 import android.content.res.Resources
 import android.os.Bundle
 import android.os.Handler
@@ -12,21 +11,19 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidlearning.R
 import com.example.androidlearning.base.constants.Constants
+import com.example.androidlearning.base.constants.Constants.ITEMS_PER_PAGE
 import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.databinding.CardProductBinding
 import com.example.androidlearning.databinding.SearchFragmentBinding
-import com.example.androidlearning.ui.addproduct.AddProductActivity
 import com.example.androidlearning.ui.addproduct.fragment.AddProductFragment
 import com.example.androidlearning.ui.search.ProductAdapter
 import com.example.androidlearning.ui.search.SearchViewModel
 import com.example.androidlearning.ui.search.productData
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
@@ -116,19 +113,24 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
                 val removedProduct = displayedProducts[position]
                 displayedProducts.removeAt(position)
                 productAdapter.notifyItemRemoved(position)
-                Snackbar.make(
+                var snackbar=Snackbar.make(
                     binding.root,
                     "Product deleted",
                     Snackbar.LENGTH_SHORT
                 ).setAction("UNDO") {
                     displayedProducts.add(position, removedProduct)
                     productAdapter.notifyItemInserted(position)
-                } .show()
-                Handler(Looper.getMainLooper()).postDelayed({
-                    if (!displayedProducts.contains(removedProduct)) {
-                        searchViewModel.deleteProduct(removedProduct)
-                    }
-                }, 2000)
+                }
+                    snackbar.addCallback(object : Snackbar.Callback() {
+                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                            if (event == DISMISS_EVENT_ACTION) return
+
+                            if (!displayedProducts.contains(removedProduct)) {
+                                searchViewModel.deleteProduct(removedProduct)
+                            }
+                        }
+                    })
+                    .show()
             }
 
             .setNegativeButton("Cancel", null)
@@ -298,9 +300,14 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             val currentSize = displayedProducts.size
             val newItems = searchViewModel.getNextPageItems()
 
-            if (newItems.isNotEmpty()) {
+            if (newItems.isNotEmpty() && newItems.size==ITEMS_PER_PAGE) {
+                productAdapter.lastProduct=false
                 displayedProducts.addAll(newItems)
-                productAdapter.notifyItemRangeInserted(currentSize, newItems.size)
+                productAdapter.notifyItemRangeInserted(currentSize-1, newItems.size)
+            }else{
+                productAdapter.lastProduct=true
+                displayedProducts.addAll(newItems)
+                productAdapter.notifyItemRangeInserted(currentSize-1, newItems.size)
             }
             showLoadingIndicator(false)
             isLoading = false
@@ -308,21 +315,26 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun showLoadingIndicator(show: Boolean) {
-        binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        val isGridView = layoutManager is GridLayoutManager
+        
+        if (isGridView || isLoading) {
+            binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        } else {
+            if (layoutManager.findLastCompletelyVisibleItemPosition()==displayedProducts.size-1){
+                productAdapter.showLoadingIndicator(show)
+            }
+        }
     }
 
 
     override fun onResume() {
         super.onResume()
-        // Reload data when returning to this fragment
         refreshProductList()
     }
 
     private fun refreshProductList() {
         displayedProducts.clear()
         productAdapter.notifyDataSetChanged()
-        binding.etSearch.setText("")
-        binding.ivClearText.visibility = View.GONE
         
         searchViewModel.loadProductsFromJson(requireContext(), searchViewModel.LOAD_DATA_FROM_REPO)
         searchViewModel.resetToAllProducts()
@@ -338,6 +350,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding.recyclerView.adapter=null
         searchRunnable?.let { searchHandler.removeCallbacks(it) }
     }
 }
