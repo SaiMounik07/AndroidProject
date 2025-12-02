@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.example.androidlearning.R
@@ -39,7 +40,7 @@ import java.util.Locale
 class AddProductFragment : Fragment() {
     private var _binding: ActivityAddProductBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: AddProductViewModel
+    private val viewModel: AddProductViewModel by viewModels()
     private var selectedImageUrl: String? = null
     private var capturedImageUri: Uri? = null
     private var editMode: Boolean=false
@@ -101,9 +102,6 @@ class AddProductFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        viewModel = ViewModelProvider(this)[AddProductViewModel::class.java]
-
         with(binding) {
             etListPrice.addTextChangedListener {
                 val listPriceText = it.toString()

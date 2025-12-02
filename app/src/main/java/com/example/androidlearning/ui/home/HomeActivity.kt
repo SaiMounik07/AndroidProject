@@ -7,6 +7,7 @@ import android.os.Looper
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,15 +29,16 @@ import com.example.androidlearning.ui.login.ConstraintLoginActivity
 import com.example.androidlearning.ui.search.SearchActivity
 import com.example.androidlearning.ui.search.fragment.ProductFragment
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeActivity:AppCompatActivity() {
     var binding: ActivityHomeBinding?=null
-    lateinit var homeViewModel: HomeViewModel
+    val homeViewModel: HomeViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityHomeBinding.inflate(layoutInflater)
-        homeViewModel=ViewModelProvider(this)[HomeViewModel::class.java]
         binding?.let {
            with(it) {
                setContentView(root)

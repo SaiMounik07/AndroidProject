@@ -7,11 +7,13 @@ import androidx.lifecycle.ViewModel
 import com.example.androidlearning.base.constants.Constants.PASSWORD
 import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.data.repository.MainRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import org.json.JSONArray
 import org.json.JSONObject
+import javax.inject.Inject
 
-class ConstraintViewModel : ViewModel() {
-    val mainRepository = MainRepository()
+@HiltViewModel
+class ConstraintViewModel @Inject constructor(private val mainRepository: MainRepository) : ViewModel() {
     fun saveValues(key: String, value: String) {
         mainRepository.saveValueByKey(key, value)
     }

@@ -1,4 +1,4 @@
-package com.example.androidlearning.di
+package com.example.androidlearning.data.di
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -25,6 +25,5 @@ class AndroidLearningModule {
     fun providesSharedPreferenceUtility(sharedPreferences: SharedPreferences): SharedPreferenceUtility {
         return SharedPreferenceUtility(sharedPreferences)
     }
-
 
 }

@@ -14,7 +14,9 @@ import com.example.androidlearning.base.constants.Constants.ENTER_USERNAME
 import com.example.androidlearning.ui.home.HomeActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ConstraintLoginActivity : AppCompatActivity() {
     lateinit var constraintViewModel: ConstraintViewModel
 
@@ -28,8 +30,6 @@ class ConstraintLoginActivity : AppCompatActivity() {
         constraintViewModel = ViewModelProvider(this)[ConstraintViewModel::class.java]
         constraintViewModel.addUser("sai","sai")
         constraintViewModel.addUser("user","user")
-//        constraintViewModel.saveValues("username", "sai")
-//        constraintViewModel.saveValues("password", "sai")
         val username = findViewById<EditText>(R.id.userfield)
         val password = findViewById<EditText>(R.id.password_field)
         val loginButton = findViewById<MaterialButton>(R.id.loginbutton)

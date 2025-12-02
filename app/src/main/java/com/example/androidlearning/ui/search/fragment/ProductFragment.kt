@@ -10,6 +10,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,14 +28,16 @@ import com.example.androidlearning.ui.search.productData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ProductFragment : Fragment(R.layout.search_fragment) {
     private var displayedProducts: MutableList<Product> = mutableListOf()
     private lateinit var productAdapter: ProductAdapter
     private lateinit var layoutManager: LinearLayoutManager
     private var isLoading = false
     private lateinit var binding: SearchFragmentBinding
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel: SearchViewModel by viewModels()
     private var searchRunnable: Runnable? = null
     private val searchHandler = Handler(Looper.getMainLooper())
 
@@ -42,8 +45,6 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = SearchFragmentBinding.bind(view)
-        searchViewModel = ViewModelProvider(requireActivity())[SearchViewModel::class.java]
-
 
         setupRecyclerView()
         setupSearchListeners()
