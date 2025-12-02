@@ -29,98 +29,104 @@ import com.example.androidlearning.ui.search.SearchActivity
 import com.example.androidlearning.ui.search.fragment.ProductFragment
 import com.google.android.material.snackbar.Snackbar
 
-class HomeActivity:AppCompatActivity() {
-    var binding: ActivityHomeBinding?=null
+class HomeActivity : AppCompatActivity() {
+
+    var binding: ActivityHomeBinding? = null
     lateinit var homeViewModel: HomeViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityHomeBinding.inflate(layoutInflater)
-        homeViewModel=ViewModelProvider(this)[HomeViewModel::class.java]
+        homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
         binding?.let {
-           with(it) {
-               setContentView(root)
-               ViewCompat.setOnApplyWindowInsetsListener(home) { v, insets ->
-                   val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                   v.setPadding(
-                       systemBars.left,
-                       systemBars.top,
-                       systemBars.right,
-                       systemBars.bottom
-                   )
-                   insets
-               }
-               supportFragmentManager.beginTransaction()
-                   .replace(R.id.home_page, HomeFragment())
-                   .commit()
+            with(it) {
+                setContentView(root)
+                ViewCompat.setOnApplyWindowInsetsListener(home) { v, insets ->
+                    val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                    v.setPadding(
+                        systemBars.left,
+                        systemBars.top,
+                        systemBars.right,
+                        systemBars.bottom
+                    )
+                    insets
+                }
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.home_page, HomeFragment())
+                    .commit()
 
-               bottomNavigation.setOnItemSelectedListener { item ->
-                   if (bottomNavigation.selectedItemId == item.itemId) {
-                       return@setOnItemSelectedListener true
-                   }
-                   when (item.itemId) {
-                       R.id.nav_home -> {
-                           supportFragmentManager.beginTransaction()
-                               .replace(R.id.home_page, HomeFragment())
-                               .commit()
-                           true
-                       }
+                bottomNavigation.setOnItemSelectedListener { item ->
+                    if (bottomNavigation.selectedItemId == item.itemId) {
+                        return@setOnItemSelectedListener true
+                    }
+                    when (item.itemId) {
+                        R.id.nav_home -> {
+                            supportFragmentManager.beginTransaction()
+                                .replace(R.id.home_page, HomeFragment())
+                                .commit()
+                            true
+                        }
 
-                       R.id.nav_search -> {
+                        R.id.nav_search -> {
 
-                           supportFragmentManager.beginTransaction()
-                               .replace(R.id.home_page, ProductFragment())
-                               .commit()
-                           true
-                       }
+                            supportFragmentManager.beginTransaction()
+                                .replace(R.id.home_page, ProductFragment())
+                                .commit()
+                            true
+                        }
 
-                       R.id.nav_add_product -> {
-                           supportFragmentManager.beginTransaction()
-                               .replace(R.id.home_page, AddProductFragment())
-                               .commit()
-                           true
-                       }
+                        R.id.nav_add_product -> {
+                            supportFragmentManager.beginTransaction()
+                                .replace(R.id.home_page, AddProductFragment())
+                                .commit()
+                            true
+                        }
 
-                       R.id.nav_logout -> {
-                           AlertDialog.Builder(this@HomeActivity)
-                               .setTitle("Logout")
-                               .setMessage("Are you sure you want to logout?")
-                               .setPositiveButton("Logout") { _, _ ->
-                                   Snackbar.make(root, "Logged out", Snackbar.LENGTH_LONG).show()
-                                   Handler(Looper.getMainLooper()).postDelayed({
-                                       startActivity(
-                                           Intent(
-                                               this@HomeActivity,
-                                               ConstraintLoginActivity::class.java
-                                           )
-                                       )
-                                   }, 1500)
-                               }
-                               .setNegativeButton("Cancel", null)
-                               .show()
+                        R.id.nav_logout -> {
+                            AlertDialog.Builder(this@HomeActivity)
+                                .setTitle("Logout")
+                                .setMessage("Are you sure you want to logout?")
+                                .setPositiveButton("Logout") { _, _ ->
+                                    Snackbar.make(root, "Logged out", Snackbar.LENGTH_LONG).show()
+                                    Handler(Looper.getMainLooper()).postDelayed({
+                                        startActivity(
+                                            Intent(
+                                                this@HomeActivity,
+                                                ConstraintLoginActivity::class.java
+                                            )
+                                        )
+                                    }, 1500)
                                 }
+                                .setNegativeButton("Cancel", null)
+                                .show()
+                        }
 
-                               }
-                     homeViewModel.logout()
-                           true
-               }
-               val username = homeViewModel.getValueByKey(USERNAME, GUEST)
-               Snackbar.make(root, "Hi $username", Snackbar.LENGTH_LONG).show()
+                    }
+                    homeViewModel.logout()
+                    true
+                }
+                val username = homeViewModel.getValueByKey(USERNAME, GUEST)
+                Snackbar.make(root, "Hi $username", Snackbar.LENGTH_LONG).show()
 
-           }
+            }
 
         }
 
 
+    }
 
-           }
-    fun replaceFragment(fragment: Fragment, addToBackStack: Boolean = true, selectBottomId: Int? = null) {
+    fun replaceFragment(
+        fragment: Fragment,
+        addToBackStack: Boolean = true,
+        selectBottomId: Int? = null
+    ) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.home_page, fragment)
             .commit()
 //        selectBottomId?.let {
 //            binding?.bottomNavigation?.selectedItemId = it
-        }
+    }
 
 
 }

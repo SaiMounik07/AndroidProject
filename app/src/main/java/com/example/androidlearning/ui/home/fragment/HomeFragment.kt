@@ -14,7 +14,7 @@ import com.example.androidlearning.ui.home.HomeActivity
 import com.example.androidlearning.ui.home.HomeViewModel
 import com.example.androidlearning.ui.search.fragment.ProductFragment
 
-class HomeFragment: Fragment(R.layout.quick_action) {
+class HomeFragment : Fragment(R.layout.quick_action) {
     lateinit var homeViewModel: HomeViewModel
     var binding: QuickActionBinding? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -27,17 +27,26 @@ class HomeFragment: Fragment(R.layout.quick_action) {
                 val username = homeViewModel.getValueByKey(USERNAME, GUEST)
                 tvLoginUser.text = "Hello $username"
                 etSearchHome.setOnClickListener {
-                    (activity as HomeActivity).replaceFragment(ProductFragment(),selectBottomId=R.id.nav_search)
+                    (activity as HomeActivity).replaceFragment(
+                        ProductFragment(),
+                        selectBottomId = R.id.nav_search
+                    )
 //                    requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
 //                        .selectedItemId=R.id.nav_search
                 }
 
                 homeContent.cardSearch.setOnClickListener {
-                    (activity as HomeActivity).replaceFragment(ProductFragment(),selectBottomId=R.id.nav_search)
+                    (activity as HomeActivity).replaceFragment(
+                        ProductFragment(),
+                        selectBottomId = R.id.nav_search
+                    )
 
                 }
                 homeContent.cardAddProduct.setOnClickListener {
-                    (activity as HomeActivity).replaceFragment(AddProductFragment(),selectBottomId=R.id.nav_add_product)
+                    (activity as HomeActivity).replaceFragment(
+                        AddProductFragment(),
+                        selectBottomId = R.id.nav_add_product
+                    )
 
                 }
 

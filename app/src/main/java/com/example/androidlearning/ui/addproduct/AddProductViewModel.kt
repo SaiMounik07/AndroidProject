@@ -10,28 +10,31 @@ import com.example.androidlearning.data.repository.MainRepository
 
 class AddProductViewModel : ViewModel() {
 
-    val mainRepository: MainRepository= MainRepository()
+    val mainRepository: MainRepository = MainRepository()
 
-    private val _discountPercent= MutableLiveData<Double>()
+    private val _discountPercent = MutableLiveData<Double>()
     val discountPercent: LiveData<Double> = _discountPercent
 
-    fun getDiscountPrice(listPrice:Double,salePrice:Double){
-        _discountPercent.value=if (listPrice > salePrice) {
+    fun getDiscountPrice(listPrice: Double, salePrice: Double) {
+        _discountPercent.value = if (listPrice > salePrice) {
             ((listPrice - salePrice) / listPrice * 100)
         } else {
             0.0
         }
     }
-    fun saveProduct(product: Product){
-        val username=mainRepository.getValueByKey(USERNAME, GUEST)
-        mainRepository.saveProduct(username.toString(),product)
+
+    fun saveProduct(product: Product) {
+        val username = mainRepository.getValueByKey(USERNAME, GUEST)
+        mainRepository.saveProduct(username.toString(), product)
     }
-    fun deleteProduct(product:Product){
-        val username=mainRepository.getValueByKey(USERNAME, GUEST)
-        mainRepository.deleteProduct(username.toString(),product)
+
+    fun deleteProduct(product: Product) {
+        val username = mainRepository.getValueByKey(USERNAME, GUEST)
+        mainRepository.deleteProduct(username.toString(), product)
     }
-    fun getProducts(): List<Product>{
-        val username=mainRepository.getValueByKey(USERNAME, GUEST)
+
+    fun getProducts(): List<Product> {
+        val username = mainRepository.getValueByKey(USERNAME, GUEST)
         return mainRepository.getProducts(username.toString())
     }
 }

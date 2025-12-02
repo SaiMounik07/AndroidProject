@@ -49,9 +49,9 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         setupSearchListeners()
         setupClickListeners()
         loadInitialData(searchViewModel.LOAD_DATA_FROM_REPO)
-        if (displayedProducts.isEmpty() && !isLoading){
+        if (displayedProducts.isEmpty() && !isLoading) {
             binding.noProductsInclude.root.visibility = View.VISIBLE
-        }else{
+        } else {
             binding.noProductsInclude.root.visibility = View.GONE
         }
     }
@@ -61,19 +61,14 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         with(binding.recyclerView) {
             this.layoutManager = this@ProductFragment.layoutManager
             visibility = View.VISIBLE
-            productAdapter = ProductAdapter(
-                products = displayedProducts,
-                onProductClick = { product ->
+            productAdapter =
+                ProductAdapter(products = displayedProducts, onProductClick = { product ->
                     showProductDetailsBottomSheet(product)
-                },
-                isGridView = false,
-                onEditClick = { product, position ->
+                }, isGridView = false, onEditClick = { product, position ->
                     handleEditProduct(product, position)
-                },
-                onDeleteClick = { product, position ->
+                }, onDeleteClick = { product, position ->
                     handleDeleteProduct(product, position)
-                }
-            )
+                })
             adapter = productAdapter
             addOnScrollListener(createScrollListener())
         }
@@ -96,45 +91,38 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             putBoolean("PRODUCT_DIAMOND_STORE", product.badge.merchantBadge == "Diamond")
         }
         fragment.arguments = bundle
-        
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.home_page, fragment)
-            .addToBackStack(null)
-            .commit()
+
+        parentFragmentManager.beginTransaction().replace(R.id.home_page, fragment)
+            .addToBackStack(null).commit()
 //        requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
 //            .selectedItemId=R.id.nav_add_product
     }
 
     private fun handleDeleteProduct(product: Product, position: Int) {
-       AlertDialog.Builder(requireContext())
-            .setTitle("Delete Product")
+        AlertDialog.Builder(requireContext()).setTitle("Delete Product")
             .setMessage("Are you sure you want to delete ${product.name}?")
             .setPositiveButton("Delete") { _, _ ->
                 val removedProduct = displayedProducts[position]
                 displayedProducts.removeAt(position)
                 productAdapter.notifyItemRemoved(position)
-                var snackbar=Snackbar.make(
-                    binding.root,
-                    "Product deleted",
-                    Snackbar.LENGTH_SHORT
+                var snackbar = Snackbar.make(
+                    binding.root, "Product deleted", Snackbar.LENGTH_SHORT
                 ).setAction("UNDO") {
                     displayedProducts.add(position, removedProduct)
                     productAdapter.notifyItemInserted(position)
                 }
-                    snackbar.addCallback(object : Snackbar.Callback() {
-                        override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                            if (event == DISMISS_EVENT_ACTION) return
+                snackbar.addCallback(object : Snackbar.Callback() {
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        if (event == DISMISS_EVENT_ACTION) return
 
-                            if (!displayedProducts.contains(removedProduct)) {
-                                searchViewModel.deleteProduct(removedProduct)
-                            }
+                        if (!displayedProducts.contains(removedProduct)) {
+                            searchViewModel.deleteProduct(removedProduct)
                         }
-                    })
-                    .show()
+                    }
+                }).show()
             }
 
-            .setNegativeButton("Cancel", null)
-            .show()
+            .setNegativeButton("Cancel", null).show()
     }
 
     private fun setupSearchListeners() {
@@ -176,10 +164,8 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun navigateToAddProduct() {
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.home_page, AddProductFragment())
-            .addToBackStack(null)
-            .commit()
+        parentFragmentManager.beginTransaction().replace(R.id.home_page, AddProductFragment())
+            .addToBackStack(null).commit()
     }
 
     private fun toggleViewType() {
@@ -199,10 +185,10 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun loadInitialData(flag: Boolean) {
-        searchViewModel.loadProductsFromJson(requireContext(),flag)
-        if (displayedProducts.isEmpty()){
+        searchViewModel.loadProductsFromJson(requireContext(), flag)
+        if (displayedProducts.isEmpty()) {
             binding.noProductsInclude.root.visibility = View.VISIBLE
-        }else{
+        } else {
             binding.noProductsInclude.root.visibility = View.GONE
         }
         loadMoreProducts()
@@ -224,7 +210,8 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun handlePagination() {
-        val isAtBottom = layoutManager.findLastCompletelyVisibleItemPosition() == displayedProducts.size - 1
+        val isAtBottom =
+            layoutManager.findLastCompletelyVisibleItemPosition() == displayedProducts.size - 1
         if (!isLoading && isAtBottom && searchViewModel.hasMoreItems()) {
             loadMoreProducts()
         }
@@ -280,7 +267,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             productData(product)
             dialog.setContentView(root)
             showProduct.visibility = View.GONE
-            ivMenu.visibility= View.GONE
+            ivMenu.visibility = View.GONE
         }
         val bottomSheet = dialog.behavior
         dialog.setOnShowListener {
@@ -300,14 +287,14 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             val currentSize = displayedProducts.size
             val newItems = searchViewModel.getNextPageItems()
 
-            if (newItems.isNotEmpty() && newItems.size==ITEMS_PER_PAGE) {
-                productAdapter.lastProduct=false
+            if (newItems.isNotEmpty() && newItems.size == ITEMS_PER_PAGE) {
+                productAdapter.lastProduct = false
                 displayedProducts.addAll(newItems)
-                productAdapter.notifyItemRangeInserted(currentSize-1, newItems.size)
-            }else{
-                productAdapter.lastProduct=true
+                productAdapter.notifyItemRangeInserted(currentSize - 1, newItems.size)
+            } else {
+                productAdapter.lastProduct = true
                 displayedProducts.addAll(newItems)
-                productAdapter.notifyItemRangeInserted(currentSize-1, newItems.size)
+                productAdapter.notifyItemRangeInserted(currentSize - 1, newItems.size)
             }
             showLoadingIndicator(false)
             isLoading = false
@@ -316,11 +303,11 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
 
     private fun showLoadingIndicator(show: Boolean) {
         val isGridView = layoutManager is GridLayoutManager
-        
+
         if (isGridView || isLoading) {
             binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
         } else {
-            if (layoutManager.findLastCompletelyVisibleItemPosition()==displayedProducts.size-1){
+            if (layoutManager.findLastCompletelyVisibleItemPosition() == displayedProducts.size - 1) {
                 productAdapter.showLoadingIndicator(show)
             }
         }
@@ -335,12 +322,12 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     private fun refreshProductList() {
         displayedProducts.clear()
         productAdapter.notifyDataSetChanged()
-        
+
         searchViewModel.loadProductsFromJson(requireContext(), searchViewModel.LOAD_DATA_FROM_REPO)
         searchViewModel.resetToAllProducts()
-        
+
         loadMoreProducts()
-        
+
         if (displayedProducts.isEmpty() && !isLoading) {
             binding.noProductsInclude.root.visibility = View.VISIBLE
         } else {
@@ -350,7 +337,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding.recyclerView.adapter=null
+        binding.recyclerView.adapter = null
         searchRunnable?.let { searchHandler.removeCallbacks(it) }
     }
 }

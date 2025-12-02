@@ -41,7 +41,7 @@ class AddProductFragment : Fragment() {
     private lateinit var viewModel: AddProductViewModel
     private var selectedImageUrl: String? = null
     private var capturedImageUri: Uri? = null
-    private var editMode: Boolean=false
+    private var editMode: Boolean = false
 
     private val galleryLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -50,7 +50,8 @@ class AddProductFragment : Fragment() {
             result.data?.data?.let { uri ->
                 selectedImageUrl = uri.toString()
                 displayImage(uri)
-                Toast.makeText(requireContext(), "Image selected from gallery", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Image selected from gallery", Toast.LENGTH_SHORT)
+                    .show()
             }
         }
     }
@@ -73,7 +74,11 @@ class AddProductFragment : Fragment() {
         if (isGranted) {
             openCamera()
         } else {
-            Toast.makeText(requireContext(), "Camera permission denied. Using placeholder instead.", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                requireContext(),
+                "Camera permission denied. Using placeholder instead.",
+                Toast.LENGTH_LONG
+            ).show()
             usePlaceholderImage()
         }
     }
@@ -84,7 +89,11 @@ class AddProductFragment : Fragment() {
         if (isGranted) {
             openGallery()
         } else {
-            Toast.makeText(requireContext(), "Storage permission denied. Using placeholder instead.", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                requireContext(),
+                "Storage permission denied. Using placeholder instead.",
+                Toast.LENGTH_LONG
+            ).show()
             usePlaceholderImage()
         }
     }
@@ -114,13 +123,14 @@ class AddProductFragment : Fragment() {
             viewModel.discountPercent.observe(viewLifecycleOwner) { value ->
                 etDiscountPercent.setText("${value.toInt()} %")
             }
-        }
-        arguments?.let { args ->
-            if (args.getBoolean("EDIT_MODE", false)) {
-                preFillProductData(args)
-                binding.tvHeader.text = "Edit Product"
-                binding.btnSave.text = "Update Product"
-                editMode=true
+
+            arguments?.let { args ->
+                if (args.getBoolean("EDIT_MODE", false)) {
+                    preFillProductData(args)
+                    tvHeader.text = "Edit Product"
+                    btnSave.text = "Update Product"
+                    editMode = true
+                }
             }
         }
 
@@ -197,6 +207,7 @@ class AddProductFragment : Fragment() {
             ) == PackageManager.PERMISSION_GRANTED -> {
                 openCamera()
             }
+
             else -> {
                 cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
@@ -211,9 +222,13 @@ class AddProductFragment : Fragment() {
         }
 
         when {
-            ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED -> {
+            ContextCompat.checkSelfPermission(
+                requireContext(),
+                permission
+            ) == PackageManager.PERMISSION_GRANTED -> {
                 openGallery()
             }
+
             else -> {
                 storagePermissionLauncher.launch(permission)
             }
@@ -234,7 +249,11 @@ class AddProductFragment : Fragment() {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, capturedImageUri)
             cameraLauncher.launch(intent)
         } catch (e: Exception) {
-            Toast.makeText(requireContext(), "Camera not available: ${e.message}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "Camera not available: ${e.message}",
+                Toast.LENGTH_SHORT
+            ).show()
             usePlaceholderImage()
         }
     }
@@ -275,15 +294,18 @@ class AddProductFragment : Fragment() {
 
         with(binding) {
 
-            if (etProductName.text.isNullOrBlank() ) {
+            if (etProductName.text.isNullOrBlank()) {
                 tilProductName.error = "Product name is required"
                 isValid = false
-            }
-            else if(viewModel.getProducts().find { it.name.equals(etProductName.text.toString(), ignoreCase = true) }!=null && !editMode){
+            } else if (viewModel.getProducts().find {
+                    it.name.equals(
+                        etProductName.text.toString(),
+                        ignoreCase = true
+                    )
+                } != null && !editMode) {
                 tilProductName.error = "Product name already exists"
                 isValid = false
-            }
-            else{
+            } else {
                 tilProductName.error = null
             }
             if (etSalePrice.text.isNullOrBlank()) {
@@ -299,7 +321,8 @@ class AddProductFragment : Fragment() {
                 }
             }
             if (selectedImageUrl == null) {
-                selectedImageUrl = "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/medium/catalog-image/MTA-0406056/enzim_enzim_orthodontic_colostrum_enhanced_pasta_gigi_-124_gr-_full32_bkdk84uh.jpeg"
+                selectedImageUrl =
+                    "https://www.static-src.com/wcsstore/Indraprastha/images/catalog/medium/catalog-image/MTA-0406056/enzim_enzim_orthodontic_colostrum_enhanced_pasta_gigi_-124_gr-_full32_bkdk84uh.jpeg"
             }
 
             if (!etListPrice.text.isNullOrBlank()) {
@@ -422,7 +445,8 @@ class AddProductFragment : Fragment() {
 
         viewModel.saveProduct(product)
 
-        val message = if (isEditMode) "Product updated: ${product.name}" else "Product saved: ${product.name}"
+        val message =
+            if (isEditMode) "Product updated: ${product.name}" else "Product saved: ${product.name}"
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).setAction("UNDO") {
             viewModel.deleteProduct(product)
             if (isEditMode) {
