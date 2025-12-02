@@ -27,10 +27,12 @@ import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.data.model.Review
 import com.example.androidlearning.ui.search.SearchActivity
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
 
+@AndroidEntryPoint
 class AddProductActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddProductBinding
     private lateinit var viewModel: AddProductViewModel

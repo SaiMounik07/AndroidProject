@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    kotlin("kapt")
+
 }
 
 android {
@@ -38,10 +41,14 @@ android {
     buildFeatures{
         viewBinding=true
     }
+    hilt {
+        enableAggregatingTask = false
+    }
 }
 
 dependencies {
     implementation(libs.hilt)
+    kapt(libs.hilt.compiler)
     implementation(libs.gson)
     implementation(libs.glide)
     implementation(libs.androidx.recyclerview)
@@ -54,4 +61,7 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+kapt{
+    correctErrorTypes = true
 }

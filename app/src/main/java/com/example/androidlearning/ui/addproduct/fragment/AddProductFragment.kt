@@ -31,10 +31,11 @@ import com.example.androidlearning.databinding.ActivityAddProductBinding
 import com.example.androidlearning.ui.addproduct.AddProductViewModel
 import com.example.androidlearning.ui.home.fragment.HomeFragment
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
-
+@AndroidEntryPoint
 class AddProductFragment : Fragment() {
     private var _binding: ActivityAddProductBinding? = null
     private val binding get() = _binding!!

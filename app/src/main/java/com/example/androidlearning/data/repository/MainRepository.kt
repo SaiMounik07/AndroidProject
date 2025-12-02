@@ -3,10 +3,11 @@ package com.example.androidlearning.data.repository
 import com.example.androidlearning.base.constants.Constants.PREFS_FILE_LOGIN
 import com.example.androidlearning.base.utils.SharedPreferenceUtility
 import com.example.androidlearning.data.model.Product
+import javax.inject.Inject
 
-class MainRepository {
-    private val sharedPreferences= SharedPreferenceUtility(PREFS_FILE_LOGIN)
-
+class MainRepository @Inject constructor()  {
+    @Inject
+    lateinit var sharedPreferences: SharedPreferenceUtility
     fun saveValueByKey(key:String,value:String){
         sharedPreferences.saveValue(key,value)
     }

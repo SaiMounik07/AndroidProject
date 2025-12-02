@@ -17,6 +17,7 @@ hilt="2.48"
 
 [libraries]
 hilt={module="com.google.dagger:hilt-android",version.ref="hilt"}
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 gson={module="com.google.code.gson:gson",version.ref="gson"}
 glide={module="com.github.bumptech.glide:glide",version.ref="glide"}
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
@@ -33,4 +34,5 @@ androidx-navigation-fragment = { group = "androidx.navigation", name = "navigati
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+hilt={ id = "com.google.dagger.hilt.android", version.ref = "hilt"}
 
