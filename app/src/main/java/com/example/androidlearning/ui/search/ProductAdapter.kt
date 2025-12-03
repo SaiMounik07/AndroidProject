@@ -67,7 +67,9 @@ class ProductAdapter(
                 onProductClick,
                 onEditClick,
                 onDeleteClick,
-                holder
+                holder,
+                lastElement = (flag && position==(products.size-1)&&!lastProduct)
+
             )
 
         }
@@ -170,6 +172,7 @@ fun CardProductBinding.productData(
         showProduct.setOnClickListener {
             onProductClick(product)
         }
+        addProduct.visibility=View.GONE
 
         ivMenu.setOnClickListener { view ->
             val popup = android.widget.PopupMenu(view.context, view)
@@ -212,7 +215,8 @@ fun CardProductGridBinding.productDataGrid(
     onProductClick: (Product) -> Unit = {},
     onEditClick: ((Product, Int) -> Unit)? = null,
     onDeleteClick: ((Product, Int) -> Unit)? = null,
-    holder: RecyclerView.ViewHolder
+    holder: RecyclerView.ViewHolder,
+    lastElement: Boolean=false
 ) {
         // Hide progress bar in grid view - use fragment's main progress bar instead
         progressBar.visibility = View.GONE
@@ -272,7 +276,7 @@ fun CardProductGridBinding.productDataGrid(
                 tvSoldNumbers.visibility = View.GONE
 
             }
-
+            addProduct.visibility=View.GONE
 
             tvSoldNumbers.text = product.soldCountTotal.toString()
             tvSoldText.text = "Terjual"
@@ -314,7 +318,12 @@ fun CardProductGridBinding.productDataGrid(
                         false
                     }
                 }
+                if(lastElement)
+                    progressBar.visibility= View.VISIBLE
+                else{
 
+                    progressBar.visibility= View.GONE
+                }
                 popup.show()
             }
 

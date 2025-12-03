@@ -1,5 +1,6 @@
 package com.example.androidlearning.data.remote.interceptor
 
+import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 import retrofit2.Invocation
@@ -21,6 +22,9 @@ class ProductInterceptor : Interceptor{
             }else{
                 request.newBuilder().build()
             }
+
+        var res=chain.proceed(response)
+        Log.i("Response",res.toString())
         return chain.proceed(response)
     }
 }
