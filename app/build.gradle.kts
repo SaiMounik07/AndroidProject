@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
     kotlin("kapt")
+    alias(libs.plugins.ksp)
 
 }
 
@@ -63,7 +64,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-
+//    implementation(libs.room.runtime)
+//    ksp(libs.room.compiletime)
+//    implementation(libs.room.ktx)
 
 }
 kapt{

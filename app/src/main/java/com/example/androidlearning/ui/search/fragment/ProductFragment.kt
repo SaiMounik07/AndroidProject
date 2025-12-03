@@ -54,6 +54,9 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         
         binding.noProductsInclude.root.visibility = View.VISIBLE
         binding.noProductsInclude.btnSearchAgain.text = "Start Searching"
+        
+        // Validate session on page load
+        searchViewModel.checkSession()
     }
 
     private fun setupRecyclerView() {
@@ -170,7 +173,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
                 binding.noProductsInclude.root.visibility= View.VISIBLE
                 AlertDialog.Builder(requireContext())
                     .setTitle("Error")
-                    .setMessage(it)
+                    .setMessage("Unable to fetch Products")
                     .setPositiveButton("OK", null)
                     .show()
 

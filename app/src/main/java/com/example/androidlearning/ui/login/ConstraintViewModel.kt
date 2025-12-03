@@ -1,19 +1,26 @@
 package com.example.androidlearning.ui.login
 
-import android.content.Intent
-import android.widget.EditText
-import android.widget.Toast
+import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.androidlearning.base.constants.Constants.PASSWORD
-import com.example.androidlearning.base.constants.Constants.USERNAME
+import androidx.lifecycle.viewModelScope
+import com.example.androidlearning.data.model.auth.Login
+import com.example.androidlearning.data.model.auth.Value
+import com.example.androidlearning.data.repository.AuthRepository
 import com.example.androidlearning.data.repository.MainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import org.json.JSONArray
-import org.json.JSONObject
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ConstraintViewModel @Inject constructor(private val mainRepository: MainRepository) : ViewModel() {
+class ConstraintViewModel @Inject constructor(
+    private val mainRepository: MainRepository,
+    private val authRepository: AuthRepository
+) : ViewModel() {
+    
+    private val _loginState = MutableLiveData<LoginState>()
+    val loginState: LiveData<LoginState> = _loginState
     fun saveValues(key: String, value: String) {
         mainRepository.saveValueByKey(key, value)
     }
@@ -22,52 +29,40 @@ class ConstraintViewModel @Inject constructor(private val mainRepository: MainRe
         return mainRepository.getValueByKey(key, value)
     }
 
-    fun validateLogin(
-        name: String,
-        password: String,
-        onSuccess: () -> Unit,
-        onFailure: () -> Unit
-    ) {
-        if (name.isEmpty() || password.isEmpty()) {
-            onFailure.invoke()
+    fun login(username: String, password: String) {
+        if (username.isEmpty() || password.isEmpty()) {
+            _loginState.value = LoginState.Error("Please enter username and password")
             return
         }
         
-        val usersJson = mainRepository.getValueByKey("USERS", "[]")
-        val usersArray = JSONArray(usersJson)
+        _loginState.value = LoginState.Loading
         
-        var isValid = false
-
-        for (i in 0 until usersArray.length()) {
-            val user = usersArray.getJSONObject(i)
-            val storedUsername = user.getString("username")
-            val storedPassword = user.getString("password")
+        viewModelScope.launch {
+            val result = authRepository.login(username, password)
             
-            if (name == storedUsername && password == storedPassword) {
-                isValid = true
-                mainRepository.saveValueByKey(USERNAME, name)
-                break
+            _loginState.value = if (result.isSuccess) {
+                val authResponse = result.getOrNull()
+                Log.i("ConstraintViewModel", "Login successful: ${authResponse.toString()}")
+                LoginState.Success(authResponse)
+            } else {
+                val error = result.exceptionOrNull()?.message ?: "Login failed"
+                Log.e("ConstraintViewModel", "Login failed: $error")
+                LoginState.Error(error)
             }
         }
-        
-        if (isValid) {
-            onSuccess.invoke()
-        } else {
-            onFailure.invoke()
+    }
+    
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logout()
         }
     }
-    fun addUser(username: String, password: String) {
-        val existing = mainRepository.getValueByKey("USERS", "[]")
-        val arr = JSONArray(existing)
+    
+    fun isLoggedIn(): Boolean = authRepository.isLoggedIn()
+}
 
-        val user = JSONObject().apply {
-            put("username", username)
-            put("password", password)
-        }
-
-        arr.put(user)
-
-        mainRepository.saveValueByKey("USERS", arr.toString())
-    }
-
+sealed class LoginState {
+    object Loading : LoginState()
+    data class Success(val authResponse: Value?) : LoginState()
+    data class Error(val message: String) : LoginState()
 }

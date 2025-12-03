@@ -18,45 +18,87 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ConstraintLoginActivity : AppCompatActivity() {
-    lateinit var constraintViewModel: ConstraintViewModel
-
-    var loginClickCount = 0
+    private lateinit var constraintViewModel: ConstraintViewModel
+    private lateinit var layout: ConstraintLayout
+    private lateinit var username: EditText
+    private lateinit var password: EditText
+    private lateinit var loginButton: MaterialButton
+    
+    private var loginClickCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_constraint)
-        val layout=findViewById<ConstraintLayout>(R.id.login_page)
+        
         constraintViewModel = ViewModelProvider(this)[ConstraintViewModel::class.java]
-        constraintViewModel.addUser("sai","sai")
-        constraintViewModel.addUser("user","user")
-        val username = findViewById<EditText>(R.id.userfield)
-        val password = findViewById<EditText>(R.id.password_field)
-        val loginButton = findViewById<MaterialButton>(R.id.loginbutton)
+        
+        // Check if session expired
+        val sessionExpired = intent.getBooleanExtra("SESSION_EXPIRED", false)
+        if (sessionExpired) {
+            Toast.makeText(this, "Session expired. Please login again.", Toast.LENGTH_LONG).show()
+        }
+        
+        // Check if already logged in (and not expired)
+        if (!sessionExpired && constraintViewModel.isLoggedIn()) {
+            navigateToHome()
+            return
+        }
+        
+        initViews()
+        observeViewModel()
+        setupClickListeners()
+    }
+    
+    private fun initViews() {
+        layout = findViewById(R.id.login_page)
+        username = findViewById(R.id.userfield)
+        password = findViewById(R.id.password_field)
+        loginButton = findViewById(R.id.loginbutton)
         username.requestFocus()
-
-
+    }
+    
+    private fun observeViewModel() {
+        constraintViewModel.loginState.observe(this) { state ->
+            when (state) {
+                is LoginState.Loading -> {
+                    loginButton.isEnabled = false
+                    loginButton.text = "Logging in..."
+                }
+                is LoginState.Success -> {
+                    loginButton.isEnabled = true
+                    loginButton.text = "Login"
+                    Snackbar.make(layout, "Login successful!", Snackbar.LENGTH_SHORT).show()
+                    navigateToHome()
+                }
+                is LoginState.Error -> {
+                    loginButton.isEnabled = true
+                    loginButton.text = "Login"
+                    Toast.makeText(this, state.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+    
+    private fun setupClickListeners() {
         loginButton.setOnClickListener {
             loginClickCount++
-            if (loginClickCount >= 1 && !username.text.toString().isEmpty()&& password.text.toString().isEmpty()) {
+            
+            val usernameText = username.text.toString()
+            val passwordText = password.text.toString()
+            
+            if (loginClickCount >= 1 && usernameText.isNotEmpty() && passwordText.isEmpty()) {
                 password.visibility = EditText.VISIBLE
                 username.isEnabled = false
                 password.requestFocus()
             } else {
-                constraintViewModel.validateLogin(
-                    name = username.text.toString(),
-                    password = password.text.toString(),
-                    onSuccess = {
-                        Snackbar.make(layout,"login success",Snackbar.LENGTH_INDEFINITE).show()
-                        startActivity(Intent(this, HomeActivity::class.java))
-
-                    },
-                    onFailure = {
-                        Toast.makeText(this, ENTER_USERNAME, Toast.LENGTH_SHORT).show()
-                    })
-
+                constraintViewModel.login(usernameText, passwordText)
             }
         }
     }
-
+    
+    private fun navigateToHome() {
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
+    }
 }

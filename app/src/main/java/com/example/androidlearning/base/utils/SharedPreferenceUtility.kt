@@ -12,7 +12,6 @@ import javax.inject.Inject
 class SharedPreferenceUtility @Inject constructor(private val sharedPreference: SharedPreferences) {
     private val edit=sharedPreference.edit()
 
-
     fun saveValue(key:String,value:String){
         edit.putString(key,value).apply()
     }

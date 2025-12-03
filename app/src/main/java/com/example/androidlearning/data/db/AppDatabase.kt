@@ -1,4 +1,4 @@
 package com.example.androidlearning.data.db
 
-class AppDatabse {
+class AppDatabase {
 }

@@ -13,6 +13,7 @@ import com.example.androidlearning.base.constants.Constants.MIN_SEARCH_LENGTH
 import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.data.model.ProductResponseData
+import com.example.androidlearning.data.repository.AuthRepository
 import com.example.androidlearning.data.repository.MainRepository
 import com.example.androidlearning.data.repository.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,6 +28,9 @@ class SearchViewModel @Inject constructor(
     
     @Inject
     lateinit var productRepository: ProductRepository
+    
+    @Inject
+    lateinit var authRepository: AuthRepository
     
     // LiveData
     private val _isLoading = MutableLiveData<Boolean>()
@@ -112,10 +116,7 @@ class SearchViewModel @Inject constructor(
         } else {
             _isPaginating.value = false
         }
-        
-        val pageInfo = "Page $currentPage/${paging?.totalPage ?: "?"}"
-        val itemInfo = "${products.size} products (Total: ${paging?.totalItem ?: "?"})"
-        Log.i("API_SUCCESS", "$pageInfo: $itemInfo")
+
     }
     
     private fun handleErrorResponse(isInitialSearch: Boolean) {
@@ -143,6 +144,15 @@ class SearchViewModel @Inject constructor(
     }
     
     fun hasMorePages(): Boolean = hasMorePages
+    
+    fun getCurrentSearchTerm(): String = currentSearchTerm
+    
+    fun checkSession() {
+        viewModelScope.launch {
+            authRepository.validateSession()
+            // If session invalid, UnauthorizedInterceptor will handle it
+        }
+    }
     
     fun clearSearch() {
         currentSearchTerm = ""
