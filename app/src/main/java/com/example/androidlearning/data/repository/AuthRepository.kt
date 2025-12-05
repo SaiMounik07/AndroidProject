@@ -71,6 +71,4 @@ class AuthRepository @Inject constructor(
     }
     
     fun isLoggedIn(): Boolean = tokenManager.isLoggedIn()
-    
-    fun getUsername(): String? = tokenManager.getUsername()
 }

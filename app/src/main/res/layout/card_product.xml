@@ -265,8 +265,23 @@
         android:contentDescription="More options"
         android:padding="4dp"
         android:clickable="true"
+        android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@id/flow_labels"
         app:layout_constraintEnd_toEndOf="parent"
+        />
+    <ImageView
+        android:id="@+id/iv_delete_icon"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="@dimen/five_dp"
+        android:contentDescription="More options"
+        android:padding="4dp"
+        android:clickable="true"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/flow_labels"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/delete_button"
+
         />
     <ProgressBar
         android:id="@+id/progressBar"

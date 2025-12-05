@@ -49,6 +49,7 @@ android {
 
 dependencies {
     implementation(libs.hilt)
+//    implementation(libs.androidx.room.ktx)
     kapt(libs.hilt.compiler)
     implementation(libs.gson)
     implementation(libs.glide)
@@ -64,9 +65,9 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
-//    implementation(libs.room.runtime)
-//    ksp(libs.room.compiletime)
-//    implementation(libs.room.ktx)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
 }
 kapt{

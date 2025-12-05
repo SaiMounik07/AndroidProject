@@ -32,14 +32,12 @@ class ConstraintLoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_constraint)
         
         constraintViewModel = ViewModelProvider(this)[ConstraintViewModel::class.java]
-        
-        // Check if session expired
+
         val sessionExpired = intent.getBooleanExtra("SESSION_EXPIRED", false)
         if (sessionExpired) {
             Toast.makeText(this, "Session expired. Please login again.", Toast.LENGTH_LONG).show()
         }
-        
-        // Check if already logged in (and not expired)
+
         if (!sessionExpired && constraintViewModel.isLoggedIn()) {
             navigateToHome()
             return

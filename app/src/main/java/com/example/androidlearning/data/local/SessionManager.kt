@@ -14,13 +14,10 @@ class SessionManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val tokenManager: TokenManager
 ) {
-    
-    private val _sessionExpired = MutableLiveData<Boolean>()
-    val sessionExpired: LiveData<Boolean> = _sessionExpired
+
     
     fun handleUnauthorized() {
         tokenManager.clearToken()
-        _sessionExpired.postValue(true)
         forceLogout()
     }
     
@@ -31,8 +28,5 @@ class SessionManager @Inject constructor(
         }
         context.startActivity(intent)
     }
-    
-    fun isSessionValid(): Boolean {
-        return tokenManager.isLoggedIn()
-    }
+
 }

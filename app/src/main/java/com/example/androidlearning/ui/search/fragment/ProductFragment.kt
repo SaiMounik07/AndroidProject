@@ -20,6 +20,7 @@ import com.example.androidlearning.R
 import com.example.androidlearning.base.constants.Constants
 import com.example.androidlearning.base.constants.Constants.ITEMS_PER_PAGE
 import com.example.androidlearning.data.model.Product
+import com.example.androidlearning.data.repository.ProductRepository
 import com.example.androidlearning.databinding.CardProductBinding
 import com.example.androidlearning.databinding.SearchFragmentBinding
 import com.example.androidlearning.ui.addproduct.fragment.AddProductFragment
@@ -30,6 +31,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProductFragment : Fragment(R.layout.search_fragment) {
@@ -43,6 +45,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     private val searchHandler = Handler(Looper.getMainLooper())
 
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = SearchFragmentBinding.bind(view)
@@ -54,8 +57,7 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         
         binding.noProductsInclude.root.visibility = View.VISIBLE
         binding.noProductsInclude.btnSearchAgain.text = "Start Searching"
-        
-        // Validate session on page load
+
         searchViewModel.checkSession()
     }
 
@@ -75,7 +77,8 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
                 },
                 onDeleteClick = { product, position ->
                     handleDeleteProduct(product, position)
-                }
+                },
+                screenName = "SEARCH"
             )
             adapter = productAdapter
             addOnScrollListener(createScrollListener())
@@ -311,11 +314,21 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         val dialog = BottomSheetDialog(requireContext())
         val bottomSheetBinding = CardProductBinding.inflate(LayoutInflater.from(requireContext()))
         with(bottomSheetBinding) {
-            productData(product)
+            productData(product, screenName = "SEARCH")
             dialog.setContentView(root)
             showProduct.visibility = View.GONE
             ivMenu.visibility= View.GONE
             addProduct.visibility= View.VISIBLE
+
+            addProduct.setOnClickListener {
+                searchViewModel.addTheProductToCartByUserId(product, onSuccess = {
+                    Snackbar.make(binding.root, "Product added to cart", Snackbar.LENGTH_SHORT).show()
+                }, onFailure = {
+                    Snackbar.make(binding.root, "Failed to add product to cart", Snackbar.LENGTH_SHORT).show()
+                })
+                dialog.dismiss()
+            }
+
         }
         val bottomSheet = dialog.behavior
         dialog.setOnShowListener {

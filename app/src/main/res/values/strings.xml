@@ -60,4 +60,6 @@
     <string name="more_options">More options</string>
     <string name="add_image">Add Image</string>
     <string name="product_image">Product Image</string>
+    <string name="my_products">My Products</string>
+    <string name="loading_more">Loading more products...</string>
 </resources>

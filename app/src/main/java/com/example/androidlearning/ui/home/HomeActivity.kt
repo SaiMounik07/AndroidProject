@@ -85,7 +85,7 @@ class HomeActivity:AppCompatActivity() {
 
                        R.id.nav_logout -> {
                            showLogoutDialog()
-                           false // Don't select logout item
+                           false
                        }
                        
                        else -> false
@@ -93,8 +93,6 @@ class HomeActivity:AppCompatActivity() {
                }
                val username = homeViewModel.getValueByKey(USERNAME, GUEST)
                Snackbar.make(root, "Hi $username", Snackbar.LENGTH_LONG).show()
-               
-               // Check session validity
                homeViewModel.checkSession()
            }
         }
@@ -105,7 +103,6 @@ class HomeActivity:AppCompatActivity() {
     private fun observeSession() {
         homeViewModel.sessionValid.observe(this) { isValid ->
             if (isValid == false) {
-                // Session invalid - will be handled by UnauthorizedInterceptor
                 Toast.makeText(this, "Session validation failed", Toast.LENGTH_SHORT).show()
             }
         }
@@ -122,15 +119,11 @@ class HomeActivity:AppCompatActivity() {
     }
     
     private fun performLogout() {
-        // Show loading
         binding?.root?.let {
             Snackbar.make(it, "Logging out...", Snackbar.LENGTH_SHORT).show()
         }
-        
-        // Call logout API
         homeViewModel.logout()
-        
-        // Navigate to login
+
         Handler(Looper.getMainLooper()).postDelayed({
             val intent = Intent(this, ConstraintLoginActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

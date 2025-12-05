@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidlearning.base.constants.Constants.GUEST
 import com.example.androidlearning.base.constants.Constants.ITEMS_PER_PAGE
-import com.example.androidlearning.base.constants.Constants.JSON_NAME
+import com.example.androidlearning.base.constants.Constants.KEY_USERNAME
 import com.example.androidlearning.base.constants.Constants.MIN_SEARCH_LENGTH
 import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.data.model.Product
@@ -16,9 +16,9 @@ import com.example.androidlearning.data.model.ProductResponseData
 import com.example.androidlearning.data.repository.AuthRepository
 import com.example.androidlearning.data.repository.MainRepository
 import com.example.androidlearning.data.repository.ProductRepository
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import retrofit2.Response
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,6 +31,7 @@ class SearchViewModel @Inject constructor(
     
     @Inject
     lateinit var authRepository: AuthRepository
+    var isSaved: Boolean = false
     
     // LiveData
     private val _isLoading = MutableLiveData<Boolean>()
@@ -150,7 +151,6 @@ class SearchViewModel @Inject constructor(
     fun checkSession() {
         viewModelScope.launch {
             authRepository.validateSession()
-            // If session invalid, UnauthorizedInterceptor will handle it
         }
     }
     
@@ -165,9 +165,18 @@ class SearchViewModel @Inject constructor(
     fun deleteProduct(product: Product) {
         val username = mainRepository.getValueByKey(USERNAME, GUEST)
         mainRepository.deleteProduct(username.toString(), product)
-        
-        // Remove from current results
         _searchResults.value = _searchResults.value?.filter { it.name != product.name }
+    }
+    fun addTheProductToCartByUserId(products: Product,onSuccess:()->Unit,onFailure:()->Unit) {
+        val userId = mainRepository.getValueByKey(KEY_USERNAME, GUEST)
+        viewModelScope.launch{
+            isSaved= productRepository.saveProductsForUser(userId.toString(), products)
+            if(isSaved){
+                onSuccess.invoke()
+            }else{
+                onFailure.invoke()
+            }
+        }
     }
 
 }

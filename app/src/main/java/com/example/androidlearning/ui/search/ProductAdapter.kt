@@ -14,10 +14,12 @@ import com.example.androidlearning.data.model.Product
 
 class ProductAdapter(
     private var products: List<Product>, 
-    private val onProductClick: (Product) -> Unit,
+    private val onProductClick: (Product) -> Unit={},
     private var isGridView: Boolean = false,
+    private val screenName: String? ,
     private val onEditClick: ((Product, Int) -> Unit)? = null,
     private val onDeleteClick: ((Product, Int) -> Unit)? = null
+
 ): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
      var flag = false
     var lastProduct=false
@@ -60,7 +62,8 @@ class ProductAdapter(
                 onEditClick,
                 onDeleteClick,
                 holder,
-                lastElement = (flag && position==(products.size-1)&&!lastProduct)
+                lastElement = (flag && position==(products.size-1)&&!lastProduct),
+                screenName=screenName
             )
             is GridViewHolder -> holder.binding.productDataGrid(
                 product,
@@ -95,7 +98,8 @@ fun CardProductBinding.productData(
     onEditClick: ((Product, Int) -> Unit)? = null,
     onDeleteClick: ((Product, Int) -> Unit)? = null,
     holder: RecyclerView.ViewHolder?=null,
-    lastElement: Boolean=false
+    lastElement: Boolean=false,
+    screenName: String?
 ) {
 
     if (!product.name.isEmpty()) {
@@ -169,9 +173,7 @@ fun CardProductBinding.productData(
         showProduct.setOnClickListener {
             onProductClick(product)
         }
-        showProduct.setOnClickListener {
-            onProductClick(product)
-        }
+
         addProduct.visibility=View.GONE
 
         ivMenu.setOnClickListener { view ->
@@ -200,11 +202,23 @@ fun CardProductBinding.productData(
         if(lastElement)
             progressBar.visibility= View.VISIBLE
         else{
-
             progressBar.visibility= View.GONE
         }
-
-
+        if (screenName.equals("HOME")){
+            ivMenu.visibility=View.GONE
+            addProduct.visibility=View.GONE
+            showProduct.visibility=View.GONE
+            ivDeleteIcon.visibility=View.VISIBLE
+            ivDeleteIcon.setOnClickListener {
+                onDeleteClick?.invoke(product, holder?.bindingAdapterPosition ?: 0)
+            }
+        }
+        else {
+            ivMenu.visibility = View.VISIBLE
+            addProduct.visibility=View.GONE
+            showProduct.visibility=View.VISIBLE
+            ivDeleteIcon.visibility=View.GONE
+        }
 
     }
 }
@@ -218,7 +232,6 @@ fun CardProductGridBinding.productDataGrid(
     holder: RecyclerView.ViewHolder,
     lastElement: Boolean=false
 ) {
-        // Hide progress bar in grid view - use fragment's main progress bar instead
         progressBar.visibility = View.GONE
         
         if (!product.name.isEmpty()) {
