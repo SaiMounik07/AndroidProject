@@ -14,10 +14,11 @@ object Constants {
     const val CLICK_YES="Clicked Yes"
     const val CLICK_NO="Clicked No"
     const val ENTER_USERNAME="Please Enter Username"
-    
-    // Pagination & Search
     const val LOAD_DELAY_MS = 1000L
     const val ITEMS_PER_PAGE = 10
     const val MIN_SEARCH_LENGTH = 3
     const val SEARCH_DEBOUNCE_MS = 1000L
+    const val KEY_JWT_TOKEN="jwt_token"
+    const val KEY_USERNAME="logged_in_username"
+
 }

@@ -1,15 +1,16 @@
 package com.example.androidlearning.base.utils
 
 import android.content.Context
-import com.example.androidlearning.App
+import android.content.SharedPreferences
+import com.example.androidlearning.base.App
+import com.example.androidlearning.base.constants.Constants.PREFS_FILE_LOGIN
 import com.example.androidlearning.data.model.Product
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import javax.inject.Inject
 
-class SharedPreferenceUtility(name:String) {
-    private val sharedPreference= App.instance.getSharedPreferences(name, Context.MODE_PRIVATE)
+class SharedPreferenceUtility @Inject constructor(private val sharedPreference: SharedPreferences) {
     private val edit=sharedPreference.edit()
-
 
     fun saveValue(key:String,value:String){
         edit.putString(key,value).apply()

@@ -1,93 +1,182 @@
 package com.example.androidlearning.ui.search
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.androidlearning.base.constants.Constants.GUEST
 import com.example.androidlearning.base.constants.Constants.ITEMS_PER_PAGE
-import com.example.androidlearning.base.constants.Constants.JSON_NAME
+import com.example.androidlearning.base.constants.Constants.KEY_USERNAME
 import com.example.androidlearning.base.constants.Constants.MIN_SEARCH_LENGTH
 import com.example.androidlearning.base.constants.Constants.USERNAME
-import com.example.androidlearning.base.utils.KeyboardUtils
 import com.example.androidlearning.data.model.Product
+import com.example.androidlearning.data.model.ProductResponseData
+import com.example.androidlearning.data.repository.AuthRepository
 import com.example.androidlearning.data.repository.MainRepository
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.example.androidlearning.data.repository.ProductRepository
+import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SearchViewModel: ViewModel() {
-    private var allProducts: List<Product> = emptyList()
-    private var currentSourceList: List<Product> = emptyList()
-    private var loadedCount: Int = 0
-    val mainRepository: MainRepository= MainRepository()
-    val LOAD_DATA_FROM_REPO: Boolean=true
-    fun loadProductsFromJson(context: Context,flag:Boolean) {
-        if (flag){
-            allProducts = getProducts()
-            currentSourceList = getProducts()
-
-        }else {
-            val json = context.assets.open(JSON_NAME)
-                .bufferedReader()
-                .use { it.readText() }
-            val gson = Gson()
-            val type = object : TypeToken<List<Product>>() {}.type
-            val products: List<Product> = gson.fromJson(json, type)
-            allProducts = products
-            currentSourceList = products
-        }
-    }
-
+@HiltViewModel
+class SearchViewModel @Inject constructor(
+    private val mainRepository: MainRepository
+) : ViewModel() {
     
-    fun filterProducts(query: String): List<Product> {
-        return if (query.length < MIN_SEARCH_LENGTH) {
-            allProducts
+    @Inject
+    lateinit var productRepository: ProductRepository
+    
+    @Inject
+    lateinit var authRepository: AuthRepository
+    var isSaved: Boolean = false
+    
+    // LiveData
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+    
+    private val _isPaginating = MutableLiveData<Boolean>()
+    val isPaginating: LiveData<Boolean> = _isPaginating
+    
+    private val _searchResults = MutableLiveData<List<Product>>()
+    val searchResults: LiveData<List<Product>> = _searchResults
+    
+    private val _error = MutableLiveData<String?>()
+    val error: LiveData<String?> = _error
+    
+    // Pagination state
+    private var currentSearchTerm: String = ""
+    private var currentPage: Int = 1
+    private var hasMorePages: Boolean = true
+
+    fun searchProducts(query: String) {
+        if (query.length < MIN_SEARCH_LENGTH) {
+            clearSearch()
+            return
+        }
+        
+        currentSearchTerm = query
+        currentPage = 1
+        hasMorePages = true
+        loadProducts(isInitialSearch = true)
+    }
+    
+    fun loadNextPage() {
+        if (_isLoading.value == true || !hasMorePages || currentSearchTerm.isEmpty()) return
+        
+        currentPage++
+        loadProducts(isInitialSearch = false)
+    }
+    
+    private fun loadProducts(isInitialSearch: Boolean) {
+        if (isInitialSearch) {
+            _isLoading.value = true
         } else {
-            allProducts.filter { product ->
-                product.name.contains(query, ignoreCase = true)
+            _isPaginating.value = true
+        }
+        _error.value = null
+        
+        viewModelScope.launch {
+            try {
+                val response = productRepository.getProducts(
+                    searchTerm = currentSearchTerm,
+                    showFacets = false,
+                    channelId = "mobile-web",
+                    page = currentPage,
+                    itemPerPage = ITEMS_PER_PAGE,
+                    start = (currentPage - 1) * ITEMS_PER_PAGE
+                )
+                
+                if (response.code == 200) {
+                    handleSuccessResponse(response, isInitialSearch)
+                } else {
+                    handleErrorResponse(isInitialSearch)
+                }
+            } catch (e: Exception) {
+                handleException(e, isInitialSearch)
             }
         }
     }
     
-    fun updateSourceList(filteredList: List<Product>) {
-        currentSourceList = filteredList
-        loadedCount = 0
-    }
-    
-    fun resetToAllProducts() {
-        currentSourceList = allProducts
-        loadedCount = 0
-    }
-    
-    fun getNextPageItems(): List<Product> {
-        val endIndex = (loadedCount + ITEMS_PER_PAGE).coerceAtMost(currentSourceList.size)
+    private fun handleSuccessResponse(response: ProductResponseData, isInitialSearch: Boolean) {
+        val products = response.data.products
+        val paging = response.data.paging
         
-        return if (loadedCount < endIndex) {
-            val items = currentSourceList.subList(loadedCount, endIndex)
-            loadedCount = endIndex
-            items
+        hasMorePages = paging?.let { currentPage < it.totalPage } ?: (products.size >= ITEMS_PER_PAGE)
+        
+        _searchResults.value = if (isInitialSearch) {
+            products
         } else {
-            emptyList()
+            (_searchResults.value ?: emptyList()) + products
+        }
+        
+        if (isInitialSearch) {
+            _isLoading.value = false
+        } else {
+            _isPaginating.value = false
+        }
+
+    }
+    
+    private fun handleErrorResponse(isInitialSearch: Boolean) {
+        _error.value = if (isInitialSearch) "Search failed" else "Failed to load more"
+        
+        if (isInitialSearch) {
+            _isLoading.value = false
+        } else {
+            _isPaginating.value = false
+            currentPage--
         }
     }
     
-    fun hasMoreItems(): Boolean {
-        return loadedCount < currentSourceList.size
+    private fun handleException(e: Exception, isInitialSearch: Boolean) {
+        _error.value = "Network error: ${e.message}"
+        
+        if (isInitialSearch) {
+            _isLoading.value = false
+        } else {
+            _isPaginating.value = false
+            currentPage--
+        }
+        
+        Log.e("API_EXCEPTION", "Exception on page $currentPage: ${e.message}", e)
     }
     
-    fun shouldShowNoResults(filteredList: List<Product>, query: String): Boolean {
-        return query.length >= MIN_SEARCH_LENGTH && filteredList.isEmpty()
+    fun hasMorePages(): Boolean = hasMorePages
+    
+    fun getCurrentSearchTerm(): String = currentSearchTerm
+    
+    fun checkSession() {
+        viewModelScope.launch {
+            authRepository.validateSession()
+        }
     }
-    fun getProducts(): List<Product>{
-        val username=mainRepository.getValueByKey(USERNAME, GUEST)
-        return mainRepository.getProducts(username.toString())
+    
+    fun clearSearch() {
+        currentSearchTerm = ""
+        currentPage = 1
+        hasMorePages = true
+        _searchResults.value = emptyList()
+        _error.value = null
     }
-
+    
     fun deleteProduct(product: Product) {
-        allProducts = allProducts.filter { it.name != product.name }
-        currentSourceList = currentSourceList.filter { it.name != product.name }
         val username = mainRepository.getValueByKey(USERNAME, GUEST)
         mainRepository.deleteProduct(username.toString(), product)
+        _searchResults.value = _searchResults.value?.filter { it.name != product.name }
+    }
+    fun addTheProductToCartByUserId(products: Product,onSuccess:()->Unit,onFailure:()->Unit) {
+        val userId = mainRepository.getValueByKey(KEY_USERNAME, GUEST)
+        viewModelScope.launch{
+            isSaved= productRepository.saveProductsForUser(userId.toString(), products)
+            if(isSaved){
+                onSuccess.invoke()
+            }else{
+                onFailure.invoke()
+            }
+        }
     }
 
 }

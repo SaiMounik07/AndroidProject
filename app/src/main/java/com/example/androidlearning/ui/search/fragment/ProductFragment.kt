@@ -7,9 +7,11 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,7 @@ import com.example.androidlearning.R
 import com.example.androidlearning.base.constants.Constants
 import com.example.androidlearning.base.constants.Constants.ITEMS_PER_PAGE
 import com.example.androidlearning.data.model.Product
+import com.example.androidlearning.data.repository.ProductRepository
 import com.example.androidlearning.databinding.CardProductBinding
 import com.example.androidlearning.databinding.SearchFragmentBinding
 import com.example.androidlearning.ui.addproduct.fragment.AddProductFragment
@@ -27,33 +30,35 @@ import com.example.androidlearning.ui.search.productData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ProductFragment : Fragment(R.layout.search_fragment) {
     private var displayedProducts: MutableList<Product> = mutableListOf()
     private lateinit var productAdapter: ProductAdapter
     private lateinit var layoutManager: LinearLayoutManager
     private var isLoading = false
     private lateinit var binding: SearchFragmentBinding
-    private lateinit var searchViewModel: SearchViewModel
+    private val searchViewModel: SearchViewModel by viewModels()
     private var searchRunnable: Runnable? = null
     private val searchHandler = Handler(Looper.getMainLooper())
+
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = SearchFragmentBinding.bind(view)
-        searchViewModel = ViewModelProvider(requireActivity())[SearchViewModel::class.java]
-
 
         setupRecyclerView()
         setupSearchListeners()
         setupClickListeners()
-        loadInitialData(searchViewModel.LOAD_DATA_FROM_REPO)
-        if (displayedProducts.isEmpty() && !isLoading){
-            binding.noProductsInclude.root.visibility = View.VISIBLE
-        }else{
-            binding.noProductsInclude.root.visibility = View.GONE
-        }
+        observeViewModel()
+        
+        binding.noProductsInclude.root.visibility = View.VISIBLE
+        binding.noProductsInclude.btnSearchAgain.text = "Start Searching"
+
+        searchViewModel.checkSession()
     }
 
     private fun setupRecyclerView() {
@@ -72,7 +77,8 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
                 },
                 onDeleteClick = { product, position ->
                     handleDeleteProduct(product, position)
-                }
+                },
+                screenName = "SEARCH"
             )
             adapter = productAdapter
             addOnScrollListener(createScrollListener())
@@ -101,8 +107,6 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             .replace(R.id.home_page, fragment)
             .addToBackStack(null)
             .commit()
-//        requireActivity().findViewById<BottomNavigationView>(R.id.bottom_navigation)
-//            .selectedItemId=R.id.nav_add_product
     }
 
     private fun handleDeleteProduct(product: Product, position: Int) {
@@ -137,6 +141,50 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
             .show()
     }
 
+    private fun observeViewModel() {
+        searchViewModel.searchResults.observe(viewLifecycleOwner) { products ->
+            Log.d("ProductFragment", "Received ${products.size} total products")
+            
+            displayedProducts.clear()
+            displayedProducts.addAll(products)
+            productAdapter.notifyDataSetChanged()
+            
+            if (products.isEmpty()) {
+                binding.noProductsInclude.root.visibility = View.VISIBLE
+                binding.noProductsInclude.btnSearchAgain.text = "Clear Search"
+            } else {
+                binding.noProductsInclude.root.visibility = View.GONE
+            }
+        }
+
+        searchViewModel.isLoading.observe(viewLifecycleOwner) { loading ->
+            isLoading = loading
+            binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
+            binding.recyclerView.visibility = if (loading) View.GONE else View.VISIBLE
+        }
+        
+        searchViewModel.isPaginating.observe(viewLifecycleOwner) { paginating ->
+            productAdapter.showLoadingIndicator(paginating)
+            if (displayedProducts.isNotEmpty()) {
+                productAdapter.notifyItemChanged(displayedProducts.size - 1)
+            }
+        }
+        
+        searchViewModel.error.observe(viewLifecycleOwner) { error ->
+            error?.let {
+                displayedProducts.clear()
+                binding.noProductsInclude.root.visibility= View.VISIBLE
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Error")
+                    .setMessage("Unable to fetch Products")
+                    .setPositiveButton("OK", null)
+                    .show()
+
+                Snackbar.make(binding.root, it, Snackbar.LENGTH_LONG).show()
+            }
+        }
+    }
+    
     private fun setupSearchListeners() {
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -198,16 +246,6 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         binding.recyclerView.addOnScrollListener(createScrollListener())
     }
 
-    private fun loadInitialData(flag: Boolean) {
-        searchViewModel.loadProductsFromJson(requireContext(),flag)
-        if (displayedProducts.isEmpty()){
-            binding.noProductsInclude.root.visibility = View.VISIBLE
-        }else{
-            binding.noProductsInclude.root.visibility = View.GONE
-        }
-        loadMoreProducts()
-    }
-
     private fun createScrollListener() = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
             handleScrollTopButtonVisibility(rv)
@@ -224,9 +262,11 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun handlePagination() {
-        val isAtBottom = layoutManager.findLastCompletelyVisibleItemPosition() == displayedProducts.size - 1
-        if (!isLoading && isAtBottom && searchViewModel.hasMoreItems()) {
-            loadMoreProducts()
+        val isAtBottom = layoutManager.findLastCompletelyVisibleItemPosition() >= displayedProducts.size - 3
+        val isPaginating = searchViewModel.isPaginating.value == true
+        
+        if (!isLoading && !isPaginating && isAtBottom && searchViewModel.hasMorePages()) {
+            searchViewModel.loadNextPage()
         }
     }
 
@@ -252,35 +292,43 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
     }
 
     private fun performSearch(query: String) {
-        val filteredProducts = searchViewModel.filterProducts(query)
-        val shouldShowNoResults = searchViewModel.shouldShowNoResults(filteredProducts, query)
+        if (query.length >= Constants.MIN_SEARCH_LENGTH) {
+            searchViewModel.searchProducts(query)
+        } else if (query.isEmpty()) {
 
-        binding.noProductsInclude.root.visibility =
-            if (shouldShowNoResults) View.VISIBLE else View.GONE
-
-        searchViewModel.updateSourceList(filteredProducts)
-        displayedProducts.clear()
-        productAdapter.notifyDataSetChanged()
-        loadMoreProducts()
+            displayedProducts.clear()
+            productAdapter.notifyDataSetChanged()
+            binding.noProductsInclude.root.visibility = View.VISIBLE
+//            binding.noProductsInclude.tvNoProducts.text = "Search for products"
+            binding.noProductsInclude.btnSearchAgain.text = "Start Searching"
+        }
     }
 
     private fun resetSearch() {
         binding.etSearch.setText("")
-        binding.noProductsInclude.root.visibility = View.GONE
-        searchViewModel.resetToAllProducts()
-        displayedProducts.clear()
-        productAdapter.notifyDataSetChanged()
-        loadMoreProducts()
+        searchViewModel.clearSearch()
+//        showEmptyState()
     }
 
     private fun showProductDetailsBottomSheet(product: Product) {
         val dialog = BottomSheetDialog(requireContext())
         val bottomSheetBinding = CardProductBinding.inflate(LayoutInflater.from(requireContext()))
         with(bottomSheetBinding) {
-            productData(product)
+            productData(product, screenName = "SEARCH")
             dialog.setContentView(root)
             showProduct.visibility = View.GONE
             ivMenu.visibility= View.GONE
+            addProduct.visibility= View.VISIBLE
+
+            addProduct.setOnClickListener {
+                searchViewModel.addTheProductToCartByUserId(product, onSuccess = {
+                    Snackbar.make(binding.root, "Product added to cart", Snackbar.LENGTH_SHORT).show()
+                }, onFailure = {
+                    Snackbar.make(binding.root, "Failed to add product to cart", Snackbar.LENGTH_SHORT).show()
+                })
+                dialog.dismiss()
+            }
+
         }
         val bottomSheet = dialog.behavior
         dialog.setOnShowListener {
@@ -289,63 +337,8 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         }
         dialog.show()
     }
-
-    private fun loadMoreProducts() {
-        if (isLoading || !searchViewModel.hasMoreItems()) return
-
-        isLoading = true
-        showLoadingIndicator(true)
-
-        Handler(Looper.getMainLooper()).postDelayed({
-            val currentSize = displayedProducts.size
-            val newItems = searchViewModel.getNextPageItems()
-
-            if (newItems.isNotEmpty() && newItems.size==ITEMS_PER_PAGE) {
-                productAdapter.lastProduct=false
-                displayedProducts.addAll(newItems)
-                productAdapter.notifyItemRangeInserted(currentSize-1, newItems.size)
-            }else{
-                productAdapter.lastProduct=true
-                displayedProducts.addAll(newItems)
-                productAdapter.notifyItemRangeInserted(currentSize-1, newItems.size)
-            }
-            showLoadingIndicator(false)
-            isLoading = false
-        }, Constants.LOAD_DELAY_MS)
-    }
-
-    private fun showLoadingIndicator(show: Boolean) {
-        val isGridView = layoutManager is GridLayoutManager
-        
-        if (isGridView || isLoading) {
-            binding.progressBar.visibility = if (show) View.VISIBLE else View.GONE
-        } else {
-            if (layoutManager.findLastCompletelyVisibleItemPosition()==displayedProducts.size-1){
-                productAdapter.showLoadingIndicator(show)
-            }
-        }
-    }
-
-
     override fun onResume() {
         super.onResume()
-        refreshProductList()
-    }
-
-    private fun refreshProductList() {
-        displayedProducts.clear()
-        productAdapter.notifyDataSetChanged()
-        
-        searchViewModel.loadProductsFromJson(requireContext(), searchViewModel.LOAD_DATA_FROM_REPO)
-        searchViewModel.resetToAllProducts()
-        
-        loadMoreProducts()
-        
-        if (displayedProducts.isEmpty() && !isLoading) {
-            binding.noProductsInclude.root.visibility = View.VISIBLE
-        } else {
-            binding.noProductsInclude.root.visibility = View.GONE
-        }
     }
 
     override fun onDestroyView() {
@@ -353,4 +346,5 @@ class ProductFragment : Fragment(R.layout.search_fragment) {
         binding.recyclerView.adapter=null
         searchRunnable?.let { searchHandler.removeCallbacks(it) }
     }
+
 }

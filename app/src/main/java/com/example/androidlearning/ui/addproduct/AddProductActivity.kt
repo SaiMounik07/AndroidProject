@@ -12,6 +12,7 @@ import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -27,13 +28,15 @@ import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.data.model.Review
 import com.example.androidlearning.ui.search.SearchActivity
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
 
+@AndroidEntryPoint
 class AddProductActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddProductBinding
-    private lateinit var viewModel: AddProductViewModel
+    private val viewModel: AddProductViewModel by viewModels()
     private var selectedImageUrl: String? = null
     private var capturedImageUri: Uri? = null
     private val galleryLauncher = registerForActivityResult(
@@ -89,8 +92,6 @@ class AddProductActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityAddProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        viewModel = ViewModelProvider(this)[AddProductViewModel::class.java]
         with(binding) {
             binding.etListPrice.addTextChangedListener {
                 val listPriceText = it.toString()

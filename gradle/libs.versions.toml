@@ -14,9 +14,15 @@ glide="4.16.0"
 gson="2.10.1"
 navigationFragment = "2.9.6"
 hilt="2.48"
-
+retrofit="2.9.0"
+okhttp="4.11.0"
+room="2.6.1"
+ksp="2.0.21-1.0.25"
 [libraries]
+retrofit={module="com.squareup.retrofit2:retrofit",version.ref="retrofit"}
+retrofit-converter-gson={module="com.squareup.retrofit2:converter-gson",version.ref="retrofit"}
 hilt={module="com.google.dagger:hilt-android",version.ref="hilt"}
+hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 gson={module="com.google.code.gson:gson",version.ref="gson"}
 glide={module="com.github.bumptech.glide:glide",version.ref="glide"}
 androidx-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
@@ -29,8 +35,12 @@ material = { group = "com.google.android.material", name = "material", version.r
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
+room-runtime={group="androidx.room",name="room-runtime",version.ref="room"}
+room-compiler={group="androidx.room",name="room-compiler",version.ref="room"}
+room-ktx={group="androidx.room",name="room-ktx",version.ref="room"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-
+hilt={ id = "com.google.dagger.hilt.android", version.ref = "hilt"}
+ksp={id="com.google.devtools.ksp",version.ref="ksp"}

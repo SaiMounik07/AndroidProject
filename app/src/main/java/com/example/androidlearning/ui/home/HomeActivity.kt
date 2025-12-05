@@ -7,6 +7,7 @@ import android.os.Looper
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.annotation.IdRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -28,15 +29,16 @@ import com.example.androidlearning.ui.login.ConstraintLoginActivity
 import com.example.androidlearning.ui.search.SearchActivity
 import com.example.androidlearning.ui.search.fragment.ProductFragment
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeActivity:AppCompatActivity() {
     var binding: ActivityHomeBinding?=null
-    lateinit var homeViewModel: HomeViewModel
+    val homeViewModel: HomeViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         binding = ActivityHomeBinding.inflate(layoutInflater)
-        homeViewModel=ViewModelProvider(this)[HomeViewModel::class.java]
         binding?.let {
            with(it) {
                setContentView(root)
@@ -82,45 +84,58 @@ class HomeActivity:AppCompatActivity() {
                        }
 
                        R.id.nav_logout -> {
-                           AlertDialog.Builder(this@HomeActivity)
-                               .setTitle("Logout")
-                               .setMessage("Are you sure you want to logout?")
-                               .setPositiveButton("Logout") { _, _ ->
-                                   Snackbar.make(root, "Logged out", Snackbar.LENGTH_LONG).show()
-                                   Handler(Looper.getMainLooper()).postDelayed({
-                                       startActivity(
-                                           Intent(
-                                               this@HomeActivity,
-                                               ConstraintLoginActivity::class.java
-                                           )
-                                       )
-                                   }, 1500)
-                               }
-                               .setNegativeButton("Cancel", null)
-                               .show()
-                                }
-
-                               }
-                     homeViewModel.logout()
-                           true
+                           showLogoutDialog()
+                           false
+                       }
+                       
+                       else -> false
+                   }
                }
                val username = homeViewModel.getValueByKey(USERNAME, GUEST)
                Snackbar.make(root, "Hi $username", Snackbar.LENGTH_LONG).show()
-
+               homeViewModel.checkSession()
            }
-
         }
+        
+        observeSession()
+    }
+    
+    private fun observeSession() {
+        homeViewModel.sessionValid.observe(this) { isValid ->
+            if (isValid == false) {
+                Toast.makeText(this, "Session validation failed", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+    private fun showLogoutDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout?")
+            .setPositiveButton("Logout") { _, _ ->
+                performLogout()
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+    
+    private fun performLogout() {
+        binding?.root?.let {
+            Snackbar.make(it, "Logging out...", Snackbar.LENGTH_SHORT).show()
+        }
+        homeViewModel.logout()
 
-
-
-           }
+        Handler(Looper.getMainLooper()).postDelayed({
+            val intent = Intent(this, ConstraintLoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
+        }, 500)
+    }
+    
     fun replaceFragment(fragment: Fragment, addToBackStack: Boolean = true, selectBottomId: Int? = null) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.home_page, fragment)
             .commit()
-//        selectBottomId?.let {
-//            binding?.bottomNavigation?.selectedItemId = it
-        }
-
-
+    }
 }

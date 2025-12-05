@@ -51,19 +51,19 @@ class LearningActivity: AppCompatActivity() {
     fun showBottomSheet(){
         val dialog= BottomSheetDialog(this)
         val dialogView= LayoutInflater.from(this).inflate(R.layout.card_product,null)
-        val btn1=dialogView.findViewById<Button>(R.id.btn_close1)
-        val btn2=dialogView.findViewById<Button>(R.id.btn_close2)
-        val closeBtn=dialogView.findViewById<ImageView>(R.id.iv_close)
+//        val btn1=dialogView.findViewById<Button>(R.id.btn_close1)
+//        val btn2=dialogView.findViewById<Button>(R.id.btn_close2)
+//        val closeBtn=dialogView.findViewById<ImageView>(R.id.iv_close)
 
-        btn1.setOnClickListener {
-            Toast.makeText(this,"Btn1 cliked", Toast.LENGTH_SHORT).show()
-        }
-        btn2.setOnClickListener {
-            Toast.makeText(this, "Btn2 cliked", Toast.LENGTH_SHORT).show()
-        }
-        closeBtn?.setOnClickListener {
-            dialog.dismiss()
-        }
+//        btn1.setOnClickListener {
+//            Toast.makeText(this,"Btn1 cliked", Toast.LENGTH_SHORT).show()
+//        }
+//        btn2.setOnClickListener {
+//            Toast.makeText(this, "Btn2 cliked", Toast.LENGTH_SHORT).show()
+//        }
+//        closeBtn?.setOnClickListener {
+//            dialog.dismiss()
+//        }
         dialog.setContentView(dialogView)
         dialog.setCancelable(true)
         dialog.show()

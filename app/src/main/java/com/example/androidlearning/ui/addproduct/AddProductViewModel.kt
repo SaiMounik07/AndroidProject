@@ -7,11 +7,13 @@ import com.example.androidlearning.base.constants.Constants.GUEST
 import com.example.androidlearning.base.constants.Constants.USERNAME
 import com.example.androidlearning.data.model.Product
 import com.example.androidlearning.data.repository.MainRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class AddProductViewModel : ViewModel() {
-
-    val mainRepository: MainRepository= MainRepository()
-
+@HiltViewModel
+class AddProductViewModel @Inject constructor(
+    private val mainRepository: MainRepository
+) : ViewModel () {
     private val _discountPercent= MutableLiveData<Double>()
     val discountPercent: LiveData<Double> = _discountPercent
 

@@ -1,6 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.hilt)
+    kotlin("kapt")
+    alias(libs.plugins.ksp)
+
 }
 
 android {
@@ -38,10 +42,15 @@ android {
     buildFeatures{
         viewBinding=true
     }
+    hilt {
+        enableAggregatingTask = false
+    }
 }
 
 dependencies {
     implementation(libs.hilt)
+//    implementation(libs.androidx.room.ktx)
+    kapt(libs.hilt.compiler)
     implementation(libs.gson)
     implementation(libs.glide)
     implementation(libs.androidx.recyclerview)
@@ -54,4 +63,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
+}
+kapt{
+    correctErrorTypes = true
 }
